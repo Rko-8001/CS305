@@ -1,8 +1,14 @@
-
+import LandingPage from './components/sidePages/LandingPage';
+import Team from './components/sidePages/teams/Team';
+import { Routes, Route } from 'react-router-dom';
 function App() {
   return (
     <>
-      Basic Setup
+      <Routes>
+        <Route path='/' element={<LandingPage />} />
+        <Route path='/meetTheTeam' element={<Team />} />
+
+      </Routes>
     </>
   );
 }
