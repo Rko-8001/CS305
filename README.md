@@ -1,1 +1,1 @@
-# CS305-AWSP
+# CS305-Online Coding Platform
