@@ -21,5 +21,6 @@ async function main() {
     app.post("/verifyOTP",Helper.verifyOTP);
     app.post("/fillDetails",Helper.fillDetails);
     app.post("/userLogin",Helper.userLogin);
+    app.post("/updateProfile",Helper.updateProfile);
 }
 main();
