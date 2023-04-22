@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-export default function SignUpCreds({ userInfo, getUserInfo, verifyEmail }) {
+export default function SignUpCreds({ button, userInfo, getUserInfo, verifyEmail }) {
     return (
         <>
             <div className="relative flex items-center mt-8">
@@ -55,7 +55,7 @@ export default function SignUpCreds({ userInfo, getUserInfo, verifyEmail }) {
 
             <div className="mt-6">
                 <button onClick={verifyEmail} className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                    Verify Email
+                    {button}
                 </button>
 
                 <div className="mt-6 text-center ">

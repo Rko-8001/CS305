@@ -7,7 +7,7 @@ import { url } from '../components/Request';
 
 export default function SignUp() {
     const [goOtp, setGoOtp] = useState(false);
-
+    const [button, setButton] = useState("Verify Email");
     const [userInfo, setUserInfo] = useState({
         "name": "",
         "handle": "",
@@ -39,25 +39,35 @@ export default function SignUp() {
     }
     async function verifyEmail(e) {
         e.preventDefault();
+        if (button === "Verify Email") {
+            setButton("Verifying..");
+            if (!checkInfo()) {
+                window.alert("Please fill properly");
+                setButton("Verify Email");
+                return;
+            }
 
-        if (!checkInfo()) {
-            window.alert("Please fill properly");
-            return;
+            const email = userInfo.email;
+            const removeError = "aisehi";
+            const response = await fetch(`${url}/sendOTP`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, removeError })
+            });
+            if (response.status === 200) {
+                setGoOtp(true);
+            }
+            else {
+                window.alert("Already Signed Up..");
+                setButton("Verify Email");
+            }
         }
-        //logic
-        // const router = `${url}/sendOTP`;
-        // console.log(router);
-        const email = userInfo.email;
-        const removeerror = "aisehi";
-        const response = await fetch(`${url}/sendOTP`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({email, removeerror})
-        });
-        console.log(response);
-        // setGoOtp(true);
+    }
+    async function verifyOtp(e) {
+        e.preventDefault();
+        
     }
     return (
         <>
@@ -81,7 +91,7 @@ export default function SignUp() {
                                 ?
                                 <Otp userInfo={userInfo} />
                                 :
-                                <SignUpCreds getUserInfo={getUserInfo} userInfo={userInfo} verifyEmail={verifyEmail} />
+                                <SignUpCreds button={button} getUserInfo={getUserInfo} userInfo={userInfo} verifyEmail={verifyEmail} />
                         }
                     </form>
                 </div>
