@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Otp from './Otp';
 import SignUpCreds from './SignUpCreds';
 import { url } from '../components/Request';
 
+const emptyInfo = {
+    "name": "",
+    "handle": "",
+    "email": "",
+    "password": "",
+    "cpassword": "",
+    "otp": "",
+}
 export default function SignUp() {
+
+    const navigate = useNavigate();
+
     const [goOtp, setGoOtp] = useState(false);
     const [button, setButton] = useState("Verify Email");
-    const [userInfo, setUserInfo] = useState({
-        "name": "",
-        "handle": "",
-        "email": "",
-        "password": "",
-        "cpassword": "",
-    })
+    const [button2, setButton2] = useState("Sign Up");
+    const [userInfo, setUserInfo] = useState(emptyInfo);
 
     function getUserInfo(e) {
         const { name, value } = e.target;
+        addUserInfo(name, value);
+    }
 
+    const addUserInfo = (name, value) => {
         setUserInfo(prevInfo => ({
             ...prevInfo,
             [name]: value
@@ -37,6 +46,7 @@ export default function SignUp() {
             return true;
         }
     }
+
     async function verifyEmail(e) {
         e.preventDefault();
         if (button === "Verify Email") {
@@ -65,10 +75,72 @@ export default function SignUp() {
             }
         }
     }
-    async function verifyOtp(e) {
-        e.preventDefault();
-        
+
+    async function verifyOTP() {
+
+        const response = await fetch(`${url}/verifyOTP`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: userInfo.email, otp: userInfo.otp })
+        });
+        console.log(userInfo.otp);
+        console.log(response);
+        return (response.status === 200);
     }
+
+    async function createUser() {
+        const response = await fetch(`${url}/fillDetails`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: userInfo.email,
+                password: userInfo.password,
+                handle: userInfo.handle,
+                name: userInfo.name
+            })
+
+        });
+        console.log(response);
+        return (response.status === 200);
+    }
+
+    async function signUp(e) {
+        e.preventDefault();
+        if (userInfo.otp === null) {
+            window.alert("Please enter otp..");
+            return;
+        }
+
+        setButton2("Verifying OTP");
+
+        const checkVerify = await verifyOTP();
+        if (!checkVerify) {
+            window.alert("Wrong OTP entered..");
+            setButton2("Sign Up");
+            addUserInfo("otp", "");
+            return;
+        }
+        setButton2("OTP verified. Creating User..");
+
+        const checkCreate = await createUser();
+        if (!checkCreate) {
+            window.alert("Error Occurred..");
+            setButton2("Sign Up");
+            setButton("Verify Email");
+            setUserInfo(emptyInfo);
+            setGoOtp(false);
+            return;
+        }
+
+        setButton2("User Created..");
+        navigate("/signin");
+
+    }
+
     return (
         <>
             <section className="bg-white mt-10 dark:bg-gray-900">
@@ -89,7 +161,7 @@ export default function SignUp() {
                         {
                             goOtp
                                 ?
-                                <Otp userInfo={userInfo} />
+                                <Otp userInfo={userInfo} getUserInfo={getUserInfo} text={button2} signUp={signUp} />
                                 :
                                 <SignUpCreds button={button} getUserInfo={getUserInfo} userInfo={userInfo} verifyEmail={verifyEmail} />
                         }
