@@ -16,7 +16,11 @@ export default class database {
     console.log("DB Connection successful");
     const db = this.client.db(this.database);
     this.users = db.collection("Users");
-    this.otp = db.collection("otp")
+    this.otp = db.collection("otp");
+    this.problem = db.collection("Problems");
+    this.blog = db.collection("Blogs");
+    this.editorials = db.collection("Editorials");
+    this.submittedSolutions = db.collection("SubmittedSolutions");
   }
   async findOne(collection, obj, fields = null) {
     return await collection.findOne(obj, { projection: fields });

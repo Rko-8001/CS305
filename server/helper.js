@@ -124,4 +124,204 @@ export default class Helper {
       res.status(200).json({ message: "OTP Sent successfully" });
     }
   };
+  static getPostRequest = async (req, res) => {
+    const data=await adminDB.find(adminDB.problem,{
+      status:"pending"
+    });
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static verifyPostRequest = async (req, res) => {
+    let postId=req.body.postId;
+    let response=req.body.response;
+    const data=await adminDB.updateOne(adminDB.problem,{
+      _id:new ObjectId(postId)
+    },{
+      status:response
+    });
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static postBlog = async (req, res) => {
+    let title=req.body.title;
+    let content=req.body.content;
+    let author_email=req.body.author;
+    let date=req.body.date;
+    let time=req.body.time;
+    let links=req.body.links;
+    const data=await adminDB.insertOne(adminDB.blog,{
+      title:title,
+      content:content,
+      author_email:author_email,
+      date:date,
+      time:time,
+      links:links
+    });
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static postProblems = async (req, res) => {
+    let title=req.body.title;
+    let author_email=req.body.author;
+    let content=req.body.content;
+    let time_limit=req.body.time_limit;
+    let memory_limit=req.body.memory_limit;
+    let input_format=req.body.input_format;
+    let output_format=req.body.output_format;
+    let example_input=req.body.example_input;
+    let example_output=req.body.example_output;
+    let testcases=req.body.testcases;
+    let date=req.body.date;
+    let time=req.body.time;
+    const data=await adminDB.insertOne(adminDB.problem,{
+      title:title,
+      author_email:author_email,
+      content:content,
+      time_limit:time_limit,
+      memory_limit:memory_limit,
+      input_format:input_format,
+      output_format:output_format,
+      example_input:example_input,
+      example_output:example_output,
+      testcases:testcases,
+      date:date,
+      time:time,
+      status:"pending"
+    });
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static postEditorials = async (req, res) => {
+    let title=req.body.title;
+    let author_email=req.body.author;
+    let content=req.body.content;
+    let date=req.body.date;
+    let time=req.body.time;
+    let problemId=req.body.problemId;
+    const data=await adminDB.insertOne(adminDB.editorial,{
+      title:title,
+      author_email:author_email,
+      content:content,
+      date:date,
+      time:time,
+      problemId:problemId
+    });
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static commentBlog = async (req, res) => {
+    let comment=req.body.comment;
+    let email=req.body.email;
+    let date=req.body.date;
+    let time=req.body.time;
+    let blogId=req.body.blogId;
+    const data= await adminDB.update(
+      adminDB.blog,
+      { _id: new ObjectId(blogId) },
+      { $push: { comments: { comment: comment, email: email, date: date, time: time } } }
+    );
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static submitSolution = async (req, res) => {
+    let problemId=req.body.problemId;
+    let code=req.body.code;
+    let email=req.body.email;
+    let date=req.body.date;
+    let time=req.body.time;
+    let language=req.body.language;
+    const data=await adminDB.insertOne(adminDB.solution,{
+      code:code,
+      email:email,
+      date:date,
+      time:time,
+      problemId:problemId,
+      language:language,
+    });
+    if(data){
+      res.send({success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static getEditorials = async (req, res) => {
+    let problemId=req.body.problemId;
+    const data=await adminDB.find(adminDB.editorial,{
+      problemId:problemId
+    });
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static getBlogs = async (req, res) => {
+    const data=await adminDB.find(adminDB.blog,{});
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static fetchBlogComments = async (req, res) => {
+    let blogId=req.body.blogId;
+    const data=await adminDB.findOne(adminDB.blog,{
+      _id:new ObjectId(blogId)
+    });
+    if(data){
+      res.send({data:data.comments,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static fetchProblemSets = async (req, res) => {
+    const data=await adminDB.find(adminDB.problem,{
+      status:"accepted"
+    });
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static getProblemDetails = async (req, res) => {
+    let problemId=req.body.problemId;
+    const data=await adminDB.findOne(adminDB.problem,{
+      _id:new ObjectId(problemId)
+    });
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
+  static viewEditorials = async (req, res) => {
+    let problemId=req.body.problemlId;
+    const data=await adminDB.findOne(adminDB.editorial,{
+      _id:new ObjectId(problemId)
+    });
+    if(data){
+      res.send({data:data,success:true});
+    }else{
+      res.send({success:false});
+    }
+  };
 }

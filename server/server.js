@@ -22,5 +22,20 @@ async function main() {
     app.post("/fillDetails",Helper.fillDetails);
     app.post("/userLogin",Helper.userLogin);
     app.post("/updateProfile",Helper.updateProfile);
+    app.post("/getPostRequest",Helper.getPostRequest);
+    app.post("/verifyPostRequest",Helper.verifyPostRequest);
+    app.post("/verifyPostRequest",Helper.verifyPostRequest);
+    app.post("/postBlog",Helper.postBlog);
+    app.post("/postProblems",Helper.postProblems);
+    app.post("/postEditorials",Helper.postEditorials);
+    app.post("/commentBlog",Helper.commentBlog);
+    app.post("/submitSolution",Helper.submitSolution);
+    app.post("/getEditorials",Helper.getEditorials);
+    app.post("/getBlogs",Helper.getBlogs);
+    app.post("/fetchBlogComments",Helper.fetchBlogComments);
+    app.post("/fetchProblemSets",Helper.fetchProblemSets);
+    app.post("/getProblemDetails",Helper.getProblemDetails);
+    app.post("/viewEditorials",Helper.viewEditorials);
+    
 }
 main();
