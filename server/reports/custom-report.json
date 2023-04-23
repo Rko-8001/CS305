@@ -1,0 +1,179 @@
+{
+  "stats": {
+    "suites": 2,
+    "tests": 2,
+    "passes": 2,
+    "pending": 0,
+    "failures": 0,
+    "start": "2023-04-23T19:38:46.851Z",
+    "end": "2023-04-23T19:38:46.870Z",
+    "duration": 19,
+    "testsRegistered": 2,
+    "passPercent": 100,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "efea0bca-13a5-481a-aa66-e0aebb9b5daf",
+      "title": "",
+      "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
+      "file": "/test/email.test.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "06e120c0-1c75-4dd1-99da-5ab5691602e9",
+          "title": "Email",
+          "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
+          "file": "/test/email.test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "9b32cdc2-41c7-4c73-861c-f64f2e072888",
+              "title": "sendMail",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
+              "file": "/test/email.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before each\" hook in \"sendMail\"",
+                  "fullTitle": "Email sendMail \"before each\" hook in \"sendMail\"",
+                  "timedOut": false,
+                  "duration": 0,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "transporter = nodemailer.createTransport(nodemailerMock());\nemail = new Email();\nemail.transporter = transporter;\nemail.sender = \"test92.test@gmail.com\";",
+                  "err": {},
+                  "uuid": "c057394e-b19c-48d3-adb2-6c9476fc4c39",
+                  "parentUUID": "9b32cdc2-41c7-4c73-861c-f64f2e072888",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after each\" hook in \"sendMail\"",
+                  "fullTitle": "Email sendMail \"after each\" hook in \"sendMail\"",
+                  "timedOut": false,
+                  "duration": 0,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "sinon.restore();",
+                  "err": {},
+                  "uuid": "4fe29e59-5801-4fc3-974c-37766cd97288",
+                  "parentUUID": "9b32cdc2-41c7-4c73-861c-f64f2e072888",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should send an email",
+                  "fullTitle": "Email sendMail should send an email",
+                  "timedOut": false,
+                  "duration": 9,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "// to track the sendMail function of the email.transporter\nconst sendMailSpy = sinon.spy(email.transporter, \"sendMail\");\nconst receiver = \"nish95.sha@gmail.com\";\nconst subject = \"Test Email\";\nconst text = \"This is a test email.\";\n// call the sendMail function of the email class\nemail.sendMail(receiver, subject, text);\nexpect(sendMailSpy.calledOnce).to.be.true;\nexpect(sendMailSpy.firstCall.args[0]).to.deep.equal({\n  from: email.sender,\n  to: receiver,\n  subject: subject,\n  text: text,\n});",
+                  "err": {},
+                  "uuid": "a806a8e5-d91a-4849-867a-925c45aa34b7",
+                  "parentUUID": "9b32cdc2-41c7-4c73-861c-f64f2e072888",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should log an error if the email fails to send",
+                  "fullTitle": "Email sendMail should log an error if the email fails to send",
+                  "timedOut": false,
+                  "duration": 3,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const sendMailStub = sinon.stub(email.transporter, \"sendMail\");\nconst error = new Error(\"Error sending email\");\nsendMailStub.callsFake((_mailObj, callback) => {\n  callback(error);\n});\nconst consoleSpy = sinon.spy(console, \"log\");\nconst receiver = \"nish95.sha@gmail.com\";\nconst subject = \"Test Email\";\nconst text = \"This is a test email.\";\nemail.sendMail(receiver, subject, text);\nexpect(sendMailStub.calledOnce).to.be.true;\nexpect(consoleSpy.callCount).to.be.equal(2);\nexpect(consoleSpy.firstCall.args[0]).to.equal(\n  \"The following error occured while sending mail.\"\n);\nexpect(consoleSpy.secondCall.args[0]).to.equal(error.message);",
+                  "err": {},
+                  "uuid": "74ed5ff5-3b1f-4a43-bd81-ff6bb146706c",
+                  "parentUUID": "9b32cdc2-41c7-4c73-861c-f64f2e072888",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "a806a8e5-d91a-4849-867a-925c45aa34b7",
+                "74ed5ff5-3b1f-4a43-bd81-ff6bb146706c"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 12,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "10.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "custom-report",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.3"
+    },
+    "marge": {
+      "options": {
+        "reportFilename": "custom-report",
+        "reportDir": "reports"
+      },
+      "version": "6.2.0"
+    }
+  }
+}

@@ -3,5 +3,5 @@ import Email from "./email.js";
 import dotenv from "dotenv";
 dotenv.config();
 const adminDB = new database(process.env.DB_URI, process.env.DB_NAME);
-const adminMail = new Email(process.env.ADMINEMAIL, process.env.ADMINPASSWORD);
+const adminMail = new Email();
 export { adminDB, adminMail }

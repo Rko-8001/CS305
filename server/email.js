@@ -4,7 +4,7 @@ dotenv.config();
 
 // using nodemailer make a email class which sents OTP to the user from email from .env file
 export default class Email {
-  constructor(email, password) {
+  constructor() {
 
     this.sender = process.env.NODEMAILER_EMAIL;
     this.transporter = createTransport({
