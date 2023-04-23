@@ -10,8 +10,8 @@ function NavBar() {
         { name: "Home", link: "/" },
         { name: "User Guide", link: "/" },
         { name: "Team", link: "/meetTheTeam" },
-        { name: "Log In", link: "/" },
-        { name: "Sign Up", link: "/" },
+        { name: "Sign In", link: "/signin" },
+        { name: "Sign Up", link: "/signup" },
 
     ]
     return (
