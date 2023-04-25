@@ -3,6 +3,9 @@ import bcrypt from "bcrypt";
 
 export default class Helper {
   static userLogin = async (req, res) => {
+    // type 0 student
+    // type 1 coordinator
+    // type 2 admin
     // extract data from request body
     const email = req.body.email;
     const password = req.body.password;
@@ -19,12 +22,12 @@ export default class Helper {
           res.status(200).json({ message: "Login Successful" });
         } else {
           // if password does not match then send error response
-          res.status(400).json({ message: "Invalid Password" });
+          res.status(400).json({ message: "Invalid Email or Password" });
         }
       });
     } else {
       // if user does not exist then send error response
-      res.status(400).json({ message: "Invalid Email" });
+      res.status(400).json({ message: "Invalid Email or Password" });
     }
   };
   static updateProfile = async (req, res) => {
@@ -60,12 +63,13 @@ export default class Helper {
     const password = req.body.password;
     const name = req.body.name;
     const handle = req.body.handle;
+    const type = "0";
     // check if user already exists
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
       res.status(400).json({ message: "User Already Exists" });
     } else {
-      if (email === "" || password === "" || name === "" || handle === "") {
+      if (email === "" || password === "" || name === "" || handle === "" || type === "") {
         res.status(400).json({ message: "Please fill all the details" });
       }
       bcrypt.hash(password, 10, function (err, hash) {
@@ -75,6 +79,7 @@ export default class Helper {
           password: hash,
           name: name,
           handle: handle,
+          type: type,
           city: null,
           country: null,
           birthdate: null, // date of birth of the format YYYY-MM-DD

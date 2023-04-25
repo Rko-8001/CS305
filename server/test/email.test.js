@@ -59,4 +59,26 @@ describe("Email", () => {
       expect(consoleSpy.secondCall.args[0]).to.equal(error.message);
     });
   });
+  describe("sendOTP", () => {
+    let email;
+    let transporter;
+    beforeEach(() => {
+      transporter = nodemailer.createTransport(nodemailerMock());
+      email = new Email();
+      email.transporter = transporter;
+      email.sender = "test92.test@gmail.com";
+      email.sendMail = sinon.stub().resolves();
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
+    it("should send an OTP", () => {
+        const receiver = "nish95.sha@gmail.com";
+        const otp = "123456";
+        email.sendOTP(receiver, otp);
+        expect(email.sendMail.calledOnceWithExactly(receiver, "OTP",`Your OTP is ${otp}`)).to.be.true
+    });
+  });
 });

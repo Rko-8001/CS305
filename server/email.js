@@ -17,6 +17,7 @@ export default class Email {
     }); // transporter is used to send mail
   }
   sendMail(receiver, subject, text) {
+    
     let mailObj = {
       from: this.sender,
       to: receiver,
@@ -26,15 +27,20 @@ export default class Email {
     this.transporter.sendMail(mailObj, (err, _data) => {
       if (err) {
         console.log("The following error occured while sending mail.");
-        console.log(err.message);
+        throw new Error(err.message);
       } else {
         console.log("Message sent successfully.");
       }
     });
   }
 
-  sendOTP = async (email, otp) => {
-    this.sendMail(email, "OTP", `Your OTP is ${otp}`);
+  sendOTP = (email, otp) => {
+    try{
+      this.sendMail(email, "OTP", `Your OTP is ${otp}`);
+    }
+    catch(err){
+      throw new Error(err.message);
+    }
     // function to send OTP to the user
   }
 }
