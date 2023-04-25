@@ -9,26 +9,29 @@ export default class Helper {
     // extract data from request body
     const email = req.body.email;
     const password = req.body.password;
-    const type = req.body.type;
     // find user in database
     const user = await adminDB.findOne(
       adminDB.users,
-      { email: email,type:type },
-      { password: 1 }
+      { email: email },
+      {
+        password: 1,
+        type: 1
+      }
     );
+    console.log(user);
     if (user) {
       bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
           // if password matches then send success response
-          res.send({success:true, message: "Login Successful" });
+          res.send({ success: true, message: "Login Successful", "type": user.type });
         } else {
           // if password does not match then send error response
-          res.send({success:false, message: "Invalid Email or Password" });
+          res.send({ success: false, message: "Invalid Email or Password" });
         }
       });
     } else {
       // if user does not exist then send error response
-      res.send({success:false, message: "Invalid Email or Password" });
+      res.send({ success: false, message: "Invalid Email or Password" });
     }
   };
   static updateProfile = async (req, res) => {
@@ -52,10 +55,10 @@ export default class Helper {
           address: address,
         }
       );
-      res.send({success:true, message: "Profile Updated Successfully" });
+      res.send({ success: true, message: "Profile Updated Successfully" });
     } else {
       // if user does not exist then send error response
-      res.send({success:false, message: "User does not exists" });
+      res.send({ success: false, message: "User does not exists" });
     }
   };
   static fillDetails = async (req, res) => {
@@ -68,10 +71,10 @@ export default class Helper {
     // check if user already exists
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
-      res.send({success:false, message: "User already exists" });
+      res.send({ success: false, message: "User already exists" });
     } else {
       if (email === "" || password === "" || name === "" || handle === "" || type === "") {
-        res.send({success:false, message: "Please fill all the details." });
+        res.send({ success: false, message: "Please fill all the details." });
       }
       bcrypt.hash(password, 10, function (err, hash) {
         // Store hash in your password DB.
@@ -90,7 +93,7 @@ export default class Helper {
 
       // if user does not exist then register the user
 
-      res.send({success:true, message: "User Registered Successfully" });
+      res.send({ success: true, message: "User Registered Successfully" });
     }
   };
   static verifyOTP = async (req, res) => {
@@ -102,10 +105,10 @@ export default class Helper {
     if (user && user.otp == otp) {
       // if OTP matches then send success response
       await adminDB.deleteOne(adminDB.otp, { email: email });
-      res.send({success:true, message: "OTP Verified Successfully" })
+      res.send({ success: true, message: "OTP Verified Successfully" })
     } else {
       // if OTP does not match then send error response
-      res.send({success:false, message: "Invalid OTP" });
+      res.send({ success: false, message: "Invalid OTP" });
     }
   };
   static sendOTP = async (req, res) => {
@@ -115,7 +118,7 @@ export default class Helper {
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
       // if user exists then send error response
-      res.send({success:false, message: "User already exists" });
+      res.send({ success: false, message: "User already exists" });
     } else {
       // if user does not exist then register the user
       // send the random OTP to the user
@@ -128,207 +131,207 @@ export default class Helper {
       } else {
         await adminDB.insertOne(adminDB.otp, { email: email, otp: otp });
       }
-      res.send({success:true, message: "OTP Sent Successfully" });
+      res.send({ success: true, message: "OTP Sent Successfully" });
     }
   };
   static getPostRequest = async (req, res) => {
-    const data=await adminDB.find(adminDB.problem,{
-      status:"pending"
+    const data = await adminDB.find(adminDB.problem, {
+      status: "pending"
     });
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static verifyPostRequest = async (req, res) => {
-    let postId=req.body.postId;
-    let response=req.body.response;
-    const data=await adminDB.updateOne(adminDB.problem,{
-      _id:new ObjectId(postId)
-    },{
-      status:response
+    let postId = req.body.postId;
+    let response = req.body.response;
+    const data = await adminDB.updateOne(adminDB.problem, {
+      _id: new ObjectId(postId)
+    }, {
+      status: response
     });
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static postBlog = async (req, res) => {
-    let title=req.body.title;
-    let content=req.body.content;
-    let author_email=req.body.author;
-    let date=req.body.date;
-    let time=req.body.time;
-    let links=req.body.links;
-    const data=await adminDB.insertOne(adminDB.blog,{
-      title:title,
-      content:content,
-      author_email:author_email,
-      date:date,
-      time:time,
-      links:links
+    let title = req.body.title;
+    let content = req.body.content;
+    let author_email = req.body.author;
+    let date = req.body.date;
+    let time = req.body.time;
+    let links = req.body.links;
+    const data = await adminDB.insertOne(adminDB.blog, {
+      title: title,
+      content: content,
+      author_email: author_email,
+      date: date,
+      time: time,
+      links: links
     });
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static postProblems = async (req, res) => {
-    let title=req.body.title;
-    let author_email=req.body.author;
-    let content=req.body.content;
-    let time_limit=req.body.time_limit;
-    let memory_limit=req.body.memory_limit;
-    let input_format=req.body.input_format;
-    let output_format=req.body.output_format;
-    let example_input=req.body.example_input;
-    let example_output=req.body.example_output;
-    let testcases=req.body.testcases;
-    let date=req.body.date;
-    let time=req.body.time;
-    const data=await adminDB.insertOne(adminDB.problem,{
-      title:title,
-      author_email:author_email,
-      content:content,
-      time_limit:time_limit,
-      memory_limit:memory_limit,
-      input_format:input_format,
-      output_format:output_format,
-      example_input:example_input,
-      example_output:example_output,
-      testcases:testcases,
-      date:date,
-      time:time,
-      status:"pending"
+    let title = req.body.title;
+    let author_email = req.body.author;
+    let content = req.body.content;
+    let time_limit = req.body.time_limit;
+    let memory_limit = req.body.memory_limit;
+    let input_format = req.body.input_format;
+    let output_format = req.body.output_format;
+    let example_input = req.body.example_input;
+    let example_output = req.body.example_output;
+    let testcases = req.body.testcases;
+    let date = req.body.date;
+    let time = req.body.time;
+    const data = await adminDB.insertOne(adminDB.problem, {
+      title: title,
+      author_email: author_email,
+      content: content,
+      time_limit: time_limit,
+      memory_limit: memory_limit,
+      input_format: input_format,
+      output_format: output_format,
+      example_input: example_input,
+      example_output: example_output,
+      testcases: testcases,
+      date: date,
+      time: time,
+      status: "pending"
     });
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static postEditorials = async (req, res) => {
-    let title=req.body.title;
-    let author_email=req.body.author;
-    let content=req.body.content;
-    let date=req.body.date;
-    let time=req.body.time;
-    let problemId=req.body.problemId;
-    const data=await adminDB.insertOne(adminDB.editorial,{
-      title:title,
-      author_email:author_email,
-      content:content,
-      date:date,
-      time:time,
-      problemId:problemId
+    let title = req.body.title;
+    let author_email = req.body.author;
+    let content = req.body.content;
+    let date = req.body.date;
+    let time = req.body.time;
+    let problemId = req.body.problemId;
+    const data = await adminDB.insertOne(adminDB.editorial, {
+      title: title,
+      author_email: author_email,
+      content: content,
+      date: date,
+      time: time,
+      problemId: problemId
     });
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static commentBlog = async (req, res) => {
-    let comment=req.body.comment;
-    let email=req.body.email;
-    let date=req.body.date;
-    let time=req.body.time;
-    let blogId=req.body.blogId;
-    const data= await adminDB.update(
+    let comment = req.body.comment;
+    let email = req.body.email;
+    let date = req.body.date;
+    let time = req.body.time;
+    let blogId = req.body.blogId;
+    const data = await adminDB.update(
       adminDB.blog,
       { _id: new ObjectId(blogId) },
       { $push: { comments: { comment: comment, email: email, date: date, time: time } } }
     );
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static submitSolution = async (req, res) => {
-    let problemId=req.body.problemId;
-    let code=req.body.code;
-    let email=req.body.email;
-    let date=req.body.date;
-    let time=req.body.time;
-    let language=req.body.language;
-    const data=await adminDB.insertOne(adminDB.solution,{
-      code:code,
-      email:email,
-      date:date,
-      time:time,
-      problemId:problemId,
-      language:language,
+    let problemId = req.body.problemId;
+    let code = req.body.code;
+    let email = req.body.email;
+    let date = req.body.date;
+    let time = req.body.time;
+    let language = req.body.language;
+    const data = await adminDB.insertOne(adminDB.solution, {
+      code: code,
+      email: email,
+      date: date,
+      time: time,
+      problemId: problemId,
+      language: language,
     });
-    if(data){
-      res.send({success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static getEditorials = async (req, res) => {
-    let problemId=req.body.problemId;
-    const data=await adminDB.find(adminDB.editorial,{
-      problemId:problemId
+    let problemId = req.body.problemId;
+    const data = await adminDB.find(adminDB.editorial, {
+      problemId: problemId
     });
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static getBlogs = async (req, res) => {
-    const data=await adminDB.find(adminDB.blog,{});
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    const data = await adminDB.find(adminDB.blog, {});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static fetchBlogComments = async (req, res) => {
-    let blogId=req.body.blogId;
-    const data=await adminDB.findOne(adminDB.blog,{
-      _id:new ObjectId(blogId)
+    let blogId = req.body.blogId;
+    const data = await adminDB.findOne(adminDB.blog, {
+      _id: new ObjectId(blogId)
     });
-    if(data){
-      res.send({data:data.comments,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data.comments, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static fetchProblemSets = async (req, res) => {
-    const data=await adminDB.find(adminDB.problem,{
-      status:"accepted"
+    const data = await adminDB.find(adminDB.problem, {
+      status: "accepted"
     });
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static getProblemDetails = async (req, res) => {
-    let problemId=req.body.problemId;
-    const data=await adminDB.findOne(adminDB.problem,{
-      _id:new ObjectId(problemId)
+    let problemId = req.body.problemId;
+    const data = await adminDB.findOne(adminDB.problem, {
+      _id: new ObjectId(problemId)
     });
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
   static viewEditorials = async (req, res) => {
-    let problemId=req.body.problemlId;
-    const data=await adminDB.findOne(adminDB.editorial,{
-      _id:new ObjectId(problemId)
+    let problemId = req.body.problemlId;
+    const data = await adminDB.findOne(adminDB.editorial, {
+      _id: new ObjectId(problemId)
     });
-    if(data){
-      res.send({data:data,success:true});
-    }else{
-      res.send({success:false});
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
     }
   };
 }
