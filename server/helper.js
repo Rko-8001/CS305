@@ -113,6 +113,7 @@ export default class Helper {
   static sendOTP = async (req, res) => {
     // extract data from request body
     console.log(req.body);
+    const email = req.body;
     // check if user already exists
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
