@@ -1,14 +1,11 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom';
 import NavBar from '../navBars/NavBar';
 
 const loginLink = "/signin";
-const signUpLink = "/signup";
 const learnMoreLink = "/";
 
 
 export default function LandingPage() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
         <>
