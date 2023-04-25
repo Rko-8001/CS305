@@ -1,14 +1,14 @@
 {
   "stats": {
-    "suites": 3,
-    "tests": 3,
-    "passes": 3,
+    "suites": 5,
+    "tests": 4,
+    "passes": 4,
     "pending": 0,
     "failures": 0,
-    "start": "2023-04-24T13:13:41.956Z",
-    "end": "2023-04-24T13:13:41.982Z",
-    "duration": 26,
-    "testsRegistered": 3,
+    "start": "2023-04-25T22:03:05.613Z",
+    "end": "2023-04-25T22:03:05.724Z",
+    "duration": 111,
+    "testsRegistered": 4,
     "passPercent": 100,
     "pendingPercent": 0,
     "other": 0,
@@ -18,16 +18,112 @@
   },
   "results": [
     {
-      "uuid": "856a242f-9811-4c4a-a75d-94b2b66617fa",
+      "uuid": "768c5cdc-c03d-45a3-a774-da6a84f744f9",
       "title": "",
-      "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
-      "file": "/test/email.test.js",
+      "fullFile": "",
+      "file": "",
       "beforeHooks": [],
       "afterHooks": [],
       "tests": [],
       "suites": [
         {
-          "uuid": "dfa8f7fd-dd4d-4272-9ad7-955af7b14d5c",
+          "uuid": "dc4a8b88-e6b5-4249-963c-d4614e2a1fb4",
+          "title": "database",
+          "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+          "file": "/test/database.test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "1f0cd660-0397-4ca4-acc5-77af12d25296",
+              "title": "connect",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+              "file": "/test/database.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before each\" hook in \"connect\"",
+                  "fullTitle": "database connect \"before each\" hook in \"connect\"",
+                  "timedOut": false,
+                  "duration": 57,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();  \ntestDatabase = new database(uri,databaseName);",
+                  "err": {},
+                  "uuid": "5b17e439-56d1-45bf-87d5-460deb2440c8",
+                  "parentUUID": "1f0cd660-0397-4ca4-acc5-77af12d25296",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after each\" hook in \"connect\"",
+                  "fullTitle": "database connect \"after each\" hook in \"connect\"",
+                  "timedOut": false,
+                  "duration": 25,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "await mongoserver.stop();",
+                  "err": {},
+                  "uuid": "c7fffb37-e559-4b57-a1ab-51a24cb12e93",
+                  "parentUUID": "1f0cd660-0397-4ca4-acc5-77af12d25296",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should connect to the database",
+                  "fullTitle": "database connect should connect to the database",
+                  "timedOut": false,
+                  "duration": 6,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const consoleSpy = spy(console,\"log\");\nconst dbMock = {collection : stub()} // mock database collection\nconst clientMock = {\n    connect : stub().resolves() //returns a resolved promise (Which stimulates the condition when database is connected)\n, db : stub().returns(dbMock)}; //returns a mock database\ntestDatabase.client = clientMock;\nawait testDatabase.connect();\nexpect(clientMock.connect.calledOnce).to.be.true;\nexpect(consoleSpy.calledOnce).to.be.true;\nexpect(consoleSpy.firstCall.args[0]).to.equal(\"DB Connection successful\");\nexpect(clientMock.db.calledWith(databaseName)).to.be.true;\nexpect(dbMock.collection.calledWith(\"Users\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"otp\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Problems\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Blogs\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Editorials\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"SubmittedSolutions\")).to.be.true;",
+                  "err": {},
+                  "uuid": "4dbbf599-0ceb-4f06-8876-9f39c107df35",
+                  "parentUUID": "1f0cd660-0397-4ca4-acc5-77af12d25296",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "4dbbf599-0ceb-4f06-8876-9f39c107df35"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 6,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        },
+        {
+          "uuid": "261ac89c-0caa-4d04-8f78-a1db253695da",
           "title": "Email",
           "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
           "file": "/test/email.test.js",
@@ -36,7 +132,7 @@
           "tests": [],
           "suites": [
             {
-              "uuid": "1c3b2866-4cf7-4824-930d-f23ac924492a",
+              "uuid": "4d762ab3-d4fc-4d12-93c7-922e8f67d64d",
               "title": "sendMail",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
               "file": "/test/email.test.js",
@@ -45,7 +141,7 @@
                   "title": "\"before each\" hook in \"sendMail\"",
                   "fullTitle": "Email sendMail \"before each\" hook in \"sendMail\"",
                   "timedOut": false,
-                  "duration": 1,
+                  "duration": 0,
                   "state": null,
                   "speed": null,
                   "pass": false,
@@ -54,8 +150,8 @@
                   "context": null,
                   "code": "transporter = nodemailer.createTransport(nodemailerMock());\nemail = new Email();\nemail.transporter = transporter;\nemail.sender = \"test92.test@gmail.com\";",
                   "err": {},
-                  "uuid": "9fe1df0f-ef12-4707-a89a-c3f410256dbb",
-                  "parentUUID": "1c3b2866-4cf7-4824-930d-f23ac924492a",
+                  "uuid": "cc30892d-abb2-468b-bec7-bd8c2d188338",
+                  "parentUUID": "4d762ab3-d4fc-4d12-93c7-922e8f67d64d",
                   "isHook": true,
                   "skipped": false
                 }
@@ -74,8 +170,8 @@
                   "context": null,
                   "code": "sinon.restore();",
                   "err": {},
-                  "uuid": "10d48054-8104-4439-a3a2-09167eefda02",
-                  "parentUUID": "1c3b2866-4cf7-4824-930d-f23ac924492a",
+                  "uuid": "8ef47d25-bc38-4c05-af4d-af06ce3ee718",
+                  "parentUUID": "4d762ab3-d4fc-4d12-93c7-922e8f67d64d",
                   "isHook": true,
                   "skipped": false
                 }
@@ -85,7 +181,7 @@
                   "title": "should send an email",
                   "fullTitle": "Email sendMail should send an email",
                   "timedOut": false,
-                  "duration": 11,
+                  "duration": 9,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -94,45 +190,45 @@
                   "context": null,
                   "code": "// to track the sendMail function of the email.transporter\nconst sendMailSpy = sinon.spy(email.transporter, \"sendMail\");\nconst receiver = \"nish95.sha@gmail.com\";\nconst subject = \"Test Email\";\nconst text = \"This is a test email.\";\n// call the sendMail function of the email class\nemail.sendMail(receiver, subject, text);\nexpect(sendMailSpy.calledOnce).to.be.true;\nexpect(sendMailSpy.firstCall.args[0]).to.deep.equal({\n  from: email.sender,\n  to: receiver,\n  subject: subject,\n  text: text,\n});",
                   "err": {},
-                  "uuid": "31f1b206-a5f5-46a1-9be3-a74c0e01df4a",
-                  "parentUUID": "1c3b2866-4cf7-4824-930d-f23ac924492a",
+                  "uuid": "377bb230-90cc-4d39-9e10-b1fd4d55e8a8",
+                  "parentUUID": "4d762ab3-d4fc-4d12-93c7-922e8f67d64d",
                   "isHook": false,
                   "skipped": false
                 },
                 {
-                  "title": "should log an error if the email fails to send",
-                  "fullTitle": "Email sendMail should log an error if the email fails to send",
+                  "title": "should throw the error if the email fails to send",
+                  "fullTitle": "Email sendMail should throw the error if the email fails to send",
                   "timedOut": false,
-                  "duration": 3,
+                  "duration": 2,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
                   "fail": false,
                   "pending": false,
                   "context": null,
-                  "code": "const sendMailStub = sinon.stub(email.transporter, \"sendMail\");\nconst error = new Error(\"Error sending email\");\nsendMailStub.callsFake((_mailObj, callback) => {\n  callback(error);\n});\nconst consoleSpy = sinon.spy(console, \"log\");\nconst receiver = \"nish95.sha@gmail.com\";\nconst subject = \"Test Email\";\nconst text = \"This is a test email.\";\nemail.sendMail(receiver, subject, text);\nexpect(sendMailStub.calledOnce).to.be.true;\nexpect(consoleSpy.callCount).to.be.equal(2);\nexpect(consoleSpy.firstCall.args[0]).to.equal(\n  \"The following error occured while sending mail.\"\n);\nexpect(consoleSpy.secondCall.args[0]).to.equal(error.message);",
+                  "code": "// mock the sendMail function of the email.transporter\nemail.transporter.sendMail = sinon\n  .stub()\n  .yields(\"Failed to send email.\");\n  // to call the callback function of the sendMail function with the error message\nconst receiver = \"recipient@example.com\";\nconst subject = \"Test email\";\nconst text = \"This is a test email.\";\nconst errorMessage = \"Failed to send email.\";\nexpect(() => {\n  email.sendMail(receiver, subject, text);\n}).to.throw(Error, errorMessage);",
                   "err": {},
-                  "uuid": "542659e9-e968-497b-8a8c-e39ea70a9f5b",
-                  "parentUUID": "1c3b2866-4cf7-4824-930d-f23ac924492a",
+                  "uuid": "5210dc13-7b57-4e1b-84b8-7af3365ba117",
+                  "parentUUID": "4d762ab3-d4fc-4d12-93c7-922e8f67d64d",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "31f1b206-a5f5-46a1-9be3-a74c0e01df4a",
-                "542659e9-e968-497b-8a8c-e39ea70a9f5b"
+                "377bb230-90cc-4d39-9e10-b1fd4d55e8a8",
+                "5210dc13-7b57-4e1b-84b8-7af3365ba117"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 14,
+              "duration": 11,
               "root": false,
               "rootEmpty": false,
               "_timeout": 2000
             },
             {
-              "uuid": "a79beafe-ae9f-4561-86bd-792d604209ef",
+              "uuid": "25dbac59-807a-49f0-ba0e-3252b28004fe",
               "title": "sendOTP",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
               "file": "/test/email.test.js",
@@ -150,8 +246,8 @@
                   "context": null,
                   "code": "transporter = nodemailer.createTransport(nodemailerMock());\nemail = new Email();\nemail.transporter = transporter;\nemail.sender = \"test92.test@gmail.com\";\nemail.sendMail = sinon.stub().resolves();",
                   "err": {},
-                  "uuid": "a82755d2-aa3b-4353-9a10-0f0a000c6d5f",
-                  "parentUUID": "a79beafe-ae9f-4561-86bd-792d604209ef",
+                  "uuid": "5bf5c954-75c5-48cf-a232-afa63aef63a2",
+                  "parentUUID": "25dbac59-807a-49f0-ba0e-3252b28004fe",
                   "isHook": true,
                   "skipped": false
                 }
@@ -170,8 +266,8 @@
                   "context": null,
                   "code": "sinon.restore();",
                   "err": {},
-                  "uuid": "0cb878f0-462f-449d-9aea-2a041d21bb6c",
-                  "parentUUID": "a79beafe-ae9f-4561-86bd-792d604209ef",
+                  "uuid": "8006a2ba-b6c5-492e-8b8e-472eb9567c3e",
+                  "parentUUID": "25dbac59-807a-49f0-ba0e-3252b28004fe",
                   "isHook": true,
                   "skipped": false
                 }
@@ -181,29 +277,29 @@
                   "title": "should send an OTP",
                   "fullTitle": "Email sendOTP should send an OTP",
                   "timedOut": false,
-                  "duration": 1,
+                  "duration": 0,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
                   "fail": false,
                   "pending": false,
                   "context": null,
-                  "code": "const receiver = \"nish95.sha@gmail.com\";\nconst otp = \"123456\";\nemail.sendOTP(receiver, otp);\nexpect(email.sendMail.calledOnceWithExactly(receiver, \"OTP\",`Your OTP is ${otp}`)).to.be.true",
+                  "code": "const receiver = \"nish95.sha@gmail.com\";\nconst otp = \"123456\";\nemail.sendOTP(receiver, otp);\nexpect(\n  email.sendMail.calledOnceWithExactly(\n    receiver,\n    \"OTP\",\n    `Your OTP is ${otp}`\n  )\n).to.be.true;",
                   "err": {},
-                  "uuid": "8cb123c3-62c9-4eab-9ac1-9ab33062825c",
-                  "parentUUID": "a79beafe-ae9f-4561-86bd-792d604209ef",
+                  "uuid": "2f2d79ae-ca9b-4935-ab76-32e78d52ddfb",
+                  "parentUUID": "25dbac59-807a-49f0-ba0e-3252b28004fe",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "8cb123c3-62c9-4eab-9ac1-9ab33062825c"
+                "2f2d79ae-ca9b-4935-ab76-32e78d52ddfb"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 1,
+              "duration": 0,
               "root": false,
               "rootEmpty": false,
               "_timeout": 2000

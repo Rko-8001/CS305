@@ -26,8 +26,7 @@ export default class Email {
     };
     this.transporter.sendMail(mailObj, (err, _data) => {
       if (err) {
-        console.log("The following error occured while sending mail.");
-        throw new Error(err.message);
+        throw new Error("Failed to send email.");
       } else {
         console.log("Message sent successfully.");
       }
@@ -35,12 +34,7 @@ export default class Email {
   }
 
   sendOTP = (email, otp) => {
-    try{
       this.sendMail(email, "OTP", `Your OTP is ${otp}`);
-    }
-    catch(err){
-      throw new Error(err.message);
-    }
     // function to send OTP to the user
   }
 }

@@ -1,42 +1,65 @@
-import { adminDB, adminMail } from "./admin.js";
+import { adminDB, adminMail,adminJWT } from "./admin.js";
 import bcrypt from "bcrypt";
 
 export default class Helper {
+  static reGenerateToken = (req, res) => {
+    // Working fine
+    // function to re-generate jwt token
+    try{
+      const email = req.body.email;
+      const type = req.body.type;
+      const newToken = adminJWT.createToken(email, type);
+      res.send({ success: true, token: newToken });
+    }
+    catch(err){
+      res.send({ success: false, message: err });
+    }
+  } 
+
   static userLogin = async (req, res) => {
     // type 0 student
     // type 1 coordinator
     // type 2 admin
-    // extract data from request body
-    const email = req.body.email;
-    const password = req.body.password;
-    // find user in database
-    const user = await adminDB.findOne(
-      adminDB.users,
-      { email: email },
-      {
-        password: 1,
-        type: 1
-      }
-    );
-    if (user) {
-      bcrypt.compare(password, user.password, function (err, result) {
-        if (result) {
-          // if password matches then send success response
-          res.send({ success: true, message: "Login Successful", "type": user.type });
-        } else {
-          // if password does not match then send error response
-          res.send({ success: false, message: "Invalid Email or Password" });
-        }
-      });
-    } else {
-      // if user does not exist then send error response
-      res.send({ success: false, message: "Invalid Email or Password" });
-    }
+    // Working fine
+   try {
+     // extract data from request body
+     const email = req.body.email;
+     const password = req.body.password;
+     // find user in database
+     const user = await adminDB.findOne(
+       adminDB.users,
+       { email: email },
+       {
+         password: 1,
+         type: 1
+       }
+     );
+     if (user) {
+       bcrypt.compare(password, user.password, function (_err, result) {
+         if (result) {
+           // if password matches then send success response
+           const token = adminJWT.createToken(email, user.type);
+           res.send({ success: true, message: "Login Successful", "type": user.type, token: token });
+         } else {
+           // if password does not match then send error response
+           res.send({ success: false, message: "Invalid Email or Password" });
+         }
+       });
+     } else {
+       // if user does not exist then send error response
+       res.send({ success: false, message: "Invalid Email or Password" });
+     }
+   } catch (error) {
+      res.send({ success: false, message: error });
+   }
   };
   static updateProfile = async (req, res) => {
     // extract data from request body
-    const email = req.body.email;
-    const city = req.body.city;
+    // Working fine
+    try{
+      const token = req.body.token;
+      const {email,type} = adminJWT.decodeToken(token);
+      const city = req.body.city;
     const country = req.body.country;
     const birthdate = req.body.birthdate;
     const address = req.body.address;
@@ -48,17 +71,23 @@ export default class Helper {
         adminDB.users,
         { email: email },
         {
-          city: city,
-          country: country,
-          birthdate: birthdate,
-          address: address,
+          $set:{
+            city: city,
+            country: country,
+            birthdate: birthdate,
+            address: address,
+          }
         }
-      );
+        );
       res.send({ success: true, message: "Profile Updated Successfully" });
     } else {
       // if user does not exist then send error response
       res.send({ success: false, message: "User does not exists" });
     }
+  }
+  catch(err){
+    res.send({ success: false, message: err });
+  }
   };
   static fillDetails = async (req, res) => {
     // extract data from request body
@@ -75,7 +104,7 @@ export default class Helper {
       if (email === "" || password === "" || name === "" || handle === "" || type === "") {
         res.send({ success: false, message: "Please fill all the details." });
       }
-      bcrypt.hash(password, 10, function (err, hash) {
+      bcrypt.hash(password, 10, function (_err, hash) {
         // Store hash in your password DB.
         adminDB.insertOne(adminDB.users, {
           email: email,
@@ -133,7 +162,7 @@ export default class Helper {
       res.send({ success: true, message: "OTP Sent Successfully" });
     }
   };
-  static getPostRequest = async (req, res) => {
+  static getPostRequest = async (_req, res) => {
     const data = await adminDB.find(adminDB.problem, {
       status: "pending"
     });
@@ -239,7 +268,7 @@ export default class Helper {
     let date = req.body.date;
     let time = req.body.time;
     let blogId = req.body.blogId;
-    const data = await adminDB.update(
+    const data = await adminDB.updateOne(
       adminDB.blog,
       { _id: new ObjectId(blogId) },
       { $push: { comments: { comment: comment, email: email, date: date, time: time } } }
@@ -282,7 +311,7 @@ export default class Helper {
       res.send({ success: false });
     }
   };
-  static getBlogs = async (req, res) => {
+  static getBlogs = async (_req, res) => {
     const data = await adminDB.find(adminDB.blog, {});
     if (data) {
       res.send({ data: data, success: true });
@@ -301,7 +330,7 @@ export default class Helper {
       res.send({ success: false });
     }
   };
-  static fetchProblemSets = async (req, res) => {
+  static fetchProblemSets = async (_req, res) => {
     const data = await adminDB.find(adminDB.problem, {
       status: "accepted"
     });
