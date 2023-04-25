@@ -18,7 +18,6 @@ export default class Helper {
         type: 1
       }
     );
-    console.log(user);
     if (user) {
       bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
