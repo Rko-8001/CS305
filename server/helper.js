@@ -9,25 +9,26 @@ export default class Helper {
     // extract data from request body
     const email = req.body.email;
     const password = req.body.password;
+    const type = req.body.type;
     // find user in database
     const user = await adminDB.findOne(
       adminDB.users,
-      { email: email },
+      { email: email,type:type },
       { password: 1 }
     );
     if (user) {
       bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
           // if password matches then send success response
-          res.status(200).json({ message: "Login Successful" });
+          res.send({success:true, message: "Login Successful" });
         } else {
           // if password does not match then send error response
-          res.status(400).json({ message: "Invalid Email or Password" });
+          res.send({success:false, message: "Invalid Email or Password" });
         }
       });
     } else {
       // if user does not exist then send error response
-      res.status(400).json({ message: "Invalid Email or Password" });
+      res.send({success:false, message: "Invalid Email or Password" });
     }
   };
   static updateProfile = async (req, res) => {
@@ -51,10 +52,10 @@ export default class Helper {
           address: address,
         }
       );
-      res.status(200).json({ message: "Profile Updated Successfully" });
+      res.send({success:true, message: "Profile Updated Successfully" });
     } else {
       // if user does not exist then send error response
-      res.status(400).json({ message: "User does not exist" });
+      res.send({success:false, message: "User does not exists" });
     }
   };
   static fillDetails = async (req, res) => {
@@ -67,10 +68,10 @@ export default class Helper {
     // check if user already exists
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
-      res.status(400).json({ message: "User Already Exists" });
+      res.send({success:false, message: "User already exists" });
     } else {
       if (email === "" || password === "" || name === "" || handle === "" || type === "") {
-        res.status(400).json({ message: "Please fill all the details" });
+        res.send({success:false, message: "Please fill all the details." });
       }
       bcrypt.hash(password, 10, function (err, hash) {
         // Store hash in your password DB.
@@ -89,7 +90,7 @@ export default class Helper {
 
       // if user does not exist then register the user
 
-      res.status(200).json({ message: "Details filled successfully" });
+      res.send({success:true, message: "User Registered Successfully" });
     }
   };
   static verifyOTP = async (req, res) => {
@@ -101,10 +102,10 @@ export default class Helper {
     if (user && user.otp == otp) {
       // if OTP matches then send success response
       await adminDB.deleteOne(adminDB.otp, { email: email });
-      res.status(200).json({ message: "OTP Verified" });
+      res.send({success:true, message: "OTP Verified Successfully" })
     } else {
       // if OTP does not match then send error response
-      res.status(400).json({ message: "Invalid OTP" });
+      res.send({success:false, message: "Invalid OTP" });
     }
   };
   static sendOTP = async (req, res) => {
@@ -113,20 +114,21 @@ export default class Helper {
     // check if user already exists
     const user = await adminDB.findOne(adminDB.users, { email: email });
     if (user) {
-      res.status(400).json({ message: "User Already Exists" });
+      // if user exists then send error response
+      res.send({success:false, message: "User already exists" });
     } else {
       // if user does not exist then register the user
       // send the random OTP to the user
       const otp = Math.floor(Math.random() * 1000000);
       console.log("OTP: " + otp);
-      await adminMail.sendOTP(email, otp);
+      adminMail.sendOTP(email, otp);
       const checkOTP = await adminDB.findOne(adminDB.otp, { email: email });
       if (checkOTP) {
         await adminDB.updateOne(adminDB.otp, { email: email }, { otp: otp });
       } else {
         await adminDB.insertOne(adminDB.otp, { email: email, otp: otp });
       }
-      res.status(200).json({ message: "OTP Sent successfully" });
+      res.send({success:true, message: "OTP Sent Successfully" });
     }
   };
   static getPostRequest = async (req, res) => {
