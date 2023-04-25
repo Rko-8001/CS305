@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import sinon from "sinon";
-import Email from "../email.js";
+import Email from "../Components/email.js";
 import nodemailer from "nodemailer";
 import nodemailerMock from "nodemailer-mock-transport";
 import { describe } from "mocha";
@@ -37,26 +37,19 @@ describe("Email", () => {
       });
     });
 
-    it("should log an error if the email fails to send", () => {
-      const sendMailStub = sinon.stub(email.transporter, "sendMail");
-      const error = new Error("Error sending email");
-
-      sendMailStub.callsFake((_mailObj, callback) => {
-        callback(error);
-      });
-
-      const consoleSpy = sinon.spy(console, "log");
-      const receiver = "nish95.sha@gmail.com";
-      const subject = "Test Email";
+    it("should throw the error if the email fails to send", () => {
+      // mock the sendMail function of the email.transporter
+      email.transporter.sendMail = sinon
+        .stub()
+        .yields("Failed to send email.");
+        // to call the callback function of the sendMail function with the error message
+      const receiver = "recipient@example.com";
+      const subject = "Test email";
       const text = "This is a test email.";
-
-      email.sendMail(receiver, subject, text);
-      expect(sendMailStub.calledOnce).to.be.true;
-      expect(consoleSpy.callCount).to.be.equal(2);
-      expect(consoleSpy.firstCall.args[0]).to.equal(
-        "The following error occured while sending mail."
-      );
-      expect(consoleSpy.secondCall.args[0]).to.equal(error.message);
+      const errorMessage = "Failed to send email.";
+      expect(() => {
+        email.sendMail(receiver, subject, text);
+      }).to.throw(Error, errorMessage);
     });
   });
   describe("sendOTP", () => {
@@ -75,10 +68,16 @@ describe("Email", () => {
     });
 
     it("should send an OTP", () => {
-        const receiver = "nish95.sha@gmail.com";
-        const otp = "123456";
-        email.sendOTP(receiver, otp);
-        expect(email.sendMail.calledOnceWithExactly(receiver, "OTP",`Your OTP is ${otp}`)).to.be.true
+      const receiver = "nish95.sha@gmail.com";
+      const otp = "123456";
+      email.sendOTP(receiver, otp);
+      expect(
+        email.sendMail.calledOnceWithExactly(
+          receiver,
+          "OTP",
+          `Your OTP is ${otp}`
+        )
+      ).to.be.true;
     });
   });
 });
