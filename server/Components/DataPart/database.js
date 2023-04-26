@@ -1,5 +1,4 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-
 export default class database {
   constructor(uri, database) {
     this.client = new MongoClient(uri, {
@@ -32,10 +31,10 @@ export default class database {
     return await collection.insertOne(obj);
   }
   async updateOne(collection, filter, obj) {
-    return await collection.updateOne(filter, { $set: obj });
+    return await collection.updateOne(filter, obj);
   }
   async update(collection, filter, obj) {
-    return await collection.updateOne(filter, obj);
+    return await collection.update(filter, obj);
   }
   async deleteOne(collection, obj) {
     return await collection.deleteOne(obj);
