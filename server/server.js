@@ -10,7 +10,7 @@ import Helper from "./helper.js";
 const app = express();
 
 app.use(cors());
-
+console.log(new Date())
 app.use(json());
 async function main() {
     await adminDB.connect();
@@ -26,8 +26,8 @@ async function main() {
     app.post("/verifyPostRequest",Helper.verifyPostRequest);
     app.post("/verifyPostRequest",Helper.verifyPostRequest);
     app.post("/postBlog",Helper.postBlog);
-    app.post("/postProblems",Helper.postProblems);
-    app.post("/postEditorials",Helper.postEditorials);
+    app.post("/postProblem",Helper.postProblem);
+    app.post("/postEditorial",Helper.postEditorial);
     app.post("/commentBlog",Helper.commentBlog);
     app.post("/submitSolution",Helper.submitSolution);
     // app.post("/getEditorials",Helper.getEditorials);

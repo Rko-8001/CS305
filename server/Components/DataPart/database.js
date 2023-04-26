@@ -24,8 +24,8 @@ export default class database {
   async findOne(collection, obj, fields = null) {
     return await collection.findOne(obj, { projection: fields });
   }
-  async find(collection, obj, fields = null) {
-    return await collection.find(obj, { projection: fields }).toArray();
+  async find(collection, obj={},sort={}) {
+    return await collection.find(obj, { projection: fields }).sort(sort).toArray();
   }
   async insertOne(collection, obj) {
     return await collection.insertOne(obj);
