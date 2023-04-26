@@ -6,8 +6,8 @@ class JWT{
         this.jwt = jwt;
     }
 
-    createToken(email,type){
-        return this.jwt.sign({email,type},process.env.SECRET_KEY, { expiresIn: '1h' });
+    createToken(email,handle,type){
+        return this.jwt.sign({email,handle,type},process.env.SECRET_KEY, { expiresIn: '1h' });
     }
 
     verifyToken(token){

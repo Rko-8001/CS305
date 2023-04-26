@@ -1,25 +1,25 @@
 import { adminDB, adminMail, adminJWT } from "./admin.js";
 import bcrypt from "bcrypt";
-import problem from "./Components/problem.js";
+import {problem,blog} from "./Components/schema.js";
 
 
 export default class Helper {
-  static reGenerateToken = (req, res) => {
-    // Working fine
-    // function to re-generate jwt token
-    try {
-      const email = req.body.email;
-      const type = req.body.type;
-      const newToken = adminJWT.createToken(email, type);
-      res.send({
-        success: true,
-        message: "token generated successfully.",
-        token: newToken,
-      });
-    } catch (err) {
-      res.send({ success: false, message: "token generation failed" });
-    }
-  };
+  // static reGenerateToken = (req, res) => {
+  //   // Working fine
+  //   // function to re-generate jwt token
+  //   try {
+  //     const email = req.body.email;
+  //     const type = req.body.type;
+  //     const newToken = adminJWT.createToken(email, type);
+  //     res.send({
+  //       success: true,
+  //       message: "token generated successfully.",
+  //       token: newToken,
+  //     });
+  //   } catch (err) {
+  //     res.send({ success: false, message: "token generation failed" });
+  //   }
+  // };
 
   static userLogin = async (req, res) => {
     // type 0 student
@@ -37,13 +37,14 @@ export default class Helper {
         {
           password: 1,
           type: 1,
+          handle: 1,
         }
       );
       if (user) {
         bcrypt.compare(password, user.password, function (_err, result) {
           if (result) {
             // if password matches then send success response
-            const token = adminJWT.createToken(email, user.type);
+            const token = adminJWT.createToken(email, user.handle,user.type);
             res.send({
               success: true,
               message: "Login Successful",
@@ -107,7 +108,6 @@ export default class Helper {
       const name = req.body.name;
       const handle = req.body.handle;
       const type = "0";
-      const token = adminJWT.createToken(email, type);
       // check if user already exists
       const user = await adminDB.findOne(adminDB.users, { email: email });
       if (user) {
@@ -143,7 +143,6 @@ export default class Helper {
         res.send({
           success: true,
           message: "User Registered Successfully",
-          token: token,
         });
       }
     } catch (error) {
@@ -230,27 +229,29 @@ export default class Helper {
     }
   };
   static postBlog = async (req, res) => {
-    let title = req.body.title;
-    let content = req.body.content;
-    let author_email = req.body.author;
-    let date = req.body.date;
-    let time = req.body.time;
-    let links = req.body.links;
-    const data = await adminDB.insertOne(adminDB.blog, {
-      title: title,
-      content: content,
-      author_email: author_email,
-      date: date,
-      time: time,
-      links: links,
-    });
-    if (data) {
-      res.send({ success: true });
-    } else {
-      res.send({ success: false });
+    try {
+      // done
+      let token = req.body.token;
+      let decodeData = adminJWT.verifyToken(token);
+      let handle = decodeData.handle;
+      let type = decodeData.type;
+      let Blog = new blog(req.body);
+      Blog.handle = handle;
+      Blog.type = type;
+      Blog.comments = [];
+      const data = await adminDB.insertOne(adminDB.blog, Blog);
+      if (data) {
+        res.send({ success: true,message:"Blog posted." });
+      } else {
+        res.send({ success: false,message:"Blog cannot be posted due to internal error." });
+      }
+    } catch (error) {
+      res.send({success:false,message:"Blog cannot be posted due to internal error."});
     }
   };
   static postProblems = async (req, res) => {
+    // working fine
+    // only need changes in the problem object
     try {
       let token = req.body.token;
       let decodeData = adminJWT.verifyToken(token);

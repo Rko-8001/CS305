@@ -1,6 +1,4 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { Users,otp } from "./Components/DataPart/schema/User.js";
-import mongoose from "mongoose";
 export default class database {
   constructor(uri, database) {
     this.client = new MongoClient(uri, {

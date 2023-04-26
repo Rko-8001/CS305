@@ -17,7 +17,6 @@ async function main() {
   app.listen(process.env.NODE_PORT, () => {
     console.log(`Server is running on port: ${process.env.NODE_PORT}`);
   });
-    app.post("/reGenerateToken",Helper.reGenerateToken);
     app.post("/sendOTP",Helper.sendOTP);
     app.post("/verifyOTP",Helper.verifyOTP);
     app.post("/fillDetails",Helper.fillDetails);
