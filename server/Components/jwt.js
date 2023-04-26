@@ -11,7 +11,8 @@ class JWT{
     }
 
     verifyToken(token){
-        return this.jwt.verify(token, process.env.SECRET_KEY,this.config.jwt.secret);
+        
+        return this.jwt.verify(token, process.env.SECRET_KEY);
     }
     
     decodeToken(token){

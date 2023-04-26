@@ -1,4 +1,4 @@
-import database from "./Components/database.js";
+import database from "./Components/DataPart/database.js";
 import Email from "./Components/email.js";
 import JWT from "./Components/jwt.js";
 import dotenv from "dotenv";
