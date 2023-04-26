@@ -334,8 +334,11 @@ export default class Helper {
       time: time,
       problemId: problemId,
       language: language,
+      verdict: "pending" //pending, accepted, wrong answer, time limit exceeded, runtime error, compilation error, memory limit exceeded
     });
     if (data) {
+      //test the code here
+      //write a method to update the verdict based on testings
       res.send({ success: true });
     } else {
       res.send({ success: false });
@@ -403,4 +406,16 @@ export default class Helper {
       res.send({ success: false });
     }
   };
+  static getVerdict = async (req, res) => {
+    let problemId = req.body.problemId;
+    const data = await adminDB.find(adminDB.solution, {
+      problemId: problemId,
+    });
+    if (data) {
+      res.send({ data: data, success: true });
+    } else {
+      res.send({ success: false });
+    }
+  };
+  
 }

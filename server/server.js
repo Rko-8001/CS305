@@ -37,6 +37,7 @@ async function main() {
     app.post("/fetchProblemSets",Helper.fetchProblemSets);
     app.post("/getProblemDetails",Helper.getProblemDetails);
     app.post("/viewEditorials",Helper.viewEditorials);
+    app.post("/getVerdicts",Helper.viewEditorials);
     // fetchUserInfo
 }
 main();
