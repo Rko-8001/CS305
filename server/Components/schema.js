@@ -29,8 +29,8 @@ class blog {
         this.handle = obj.handle; // string
         this.type = obj.type; // string
         this.title = obj.title; // string
-        this.content = obj.content; // html string
-        this.timestamp = obj.timestamp; // DATE
+        this.content = obj.content; // string
+        this.timestamp = new Date(obj.timestamp); // DATE
         this.links = obj.links; // array of strings
         this.comments = obj.comments; // array of comments
     }
@@ -41,8 +41,8 @@ class comments {
     {
         this.handle = obj.handle;
         this.comment = obj.comment;
-        this.timestamp = obj.timestamp;
+        this.timestamp = new Date(obj.timestamp);
     }
 }
 
-export { problem, blog};
+export { problem, blog,comments};

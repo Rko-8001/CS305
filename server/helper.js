@@ -1,26 +1,12 @@
 import { adminDB, adminMail, adminJWT } from "./admin.js";
 import bcrypt from "bcrypt";
-import {problem,blog} from "./Components/schema.js";
-
+import {problem,blog,comments} from "./Components/schema.js";
+import pkg from "jsonwebtoken";
+import { ObjectId } from "mongodb";
+const { TokenExpiredError} = pkg;
 
 export default class Helper {
-  // static reGenerateToken = (req, res) => {
-  //   // Working fine
-  //   // function to re-generate jwt token
-  //   try {
-  //     const email = req.body.email;
-  //     const type = req.body.type;
-  //     const newToken = adminJWT.createToken(email, type);
-  //     res.send({
-  //       success: true,
-  //       message: "token generated successfully.",
-  //       token: newToken,
-  //     });
-  //   } catch (err) {
-  //     res.send({ success: false, message: "token generation failed" });
-  //   }
-  // };
-
+  
   static userLogin = async (req, res) => {
     // type 0 student
     // type 1 coordinator
@@ -49,7 +35,7 @@ export default class Helper {
               success: true,
               message: "Login Successful",
               type: user.type,
-              token: token,
+              userToken: token,
             });
           } else {
             // if password does not match then send error response
@@ -68,7 +54,7 @@ export default class Helper {
     // extract data from request body
     // Working fine
     try {
-      const token = req.body.token;
+      const token = req.body.userToken;
       const email = adminJWT.verifyToken(token).email;
       const city = req.body.city;
       const country = req.body.country;
@@ -96,7 +82,15 @@ export default class Helper {
         res.send({ success: false, message: "User does not exists" });
       }
     } catch (err) {
-      res.send({ success: false, message: "Profile update failed." });
+      if (err instanceof TokenExpiredError) {
+        // handle the token expired error here
+        console.log('Token has expired');
+        res.send({success:false,message:"Token has expired."})
+      } else {
+        // handle other errors here
+        console.log('Error:', err);
+        res.send({success:false,message:"Profile Updation Failed."})
+      }
     }
   };
   static fillDetails = async (req, res) => {
@@ -230,8 +224,8 @@ export default class Helper {
   };
   static postBlog = async (req, res) => {
     try {
-      // done
-      let token = req.body.token;
+      // working fine
+      let token = req.body.userToken;
       let decodeData = adminJWT.verifyToken(token);
       let handle = decodeData.handle;
       let type = decodeData.type;
@@ -246,14 +240,59 @@ export default class Helper {
         res.send({ success: false,message:"Blog cannot be posted due to internal error." });
       }
     } catch (error) {
-      res.send({success:false,message:"Blog cannot be posted due to internal error."});
+      if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        console.log('Token has expired');
+        res.send({success:false,message:"Token has expired."})
+      } else {
+        // handle other errors here
+        console.log('Error:', error);
+        res.send({success:false,message:"Blog posting failed."})
+      }
     }
   };
-  static postProblems = async (req, res) => {
+  static commentBlog = async (req, res) => {
+    // working fine
+    try {
+      let token = req.body.userToken;
+      let decodeData = adminJWT.verifyToken(token);
+      let blogId = req.body.blogId;
+      let handle = decodeData.handle;
+      let comment = req.body.comment;
+      let timestamp = req.body.timestamp;
+      let Comment = new comments({handle:handle,comment:comment,timestamp:timestamp});
+      const data = await adminDB.updateOne(
+        adminDB.blog,
+        { _id: new ObjectId(blogId) },
+        {
+          $push: {
+            comments: Comment,
+          },
+        }
+        );
+        console.log(data);
+      if (data.modifiedCount === 1) {
+        res.send({ success: true,message:"Comment posted." });
+      } else {
+        res.send({ success: false,message:"Comment cannot be posted due to internal error." });
+      }
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        console.log('Token has expired');
+        res.send({success:false,message:"Token has expired."})
+      } else {
+        // handle other errors here
+        console.log('Error:', error);
+        res.send({success:false,message:"Comment cannot be posted due to internal error."})
+      } 
+    }
+  };
+  static postProblem = async (req, res) => {
     // working fine
     // only need changes in the problem object
     try {
-      let token = req.body.token;
+      let token = req.body.userToken;
       let decodeData = adminJWT.verifyToken(token);
       let author_email = decodeData.email;
       let author_type = decodeData.type;
@@ -279,7 +318,7 @@ export default class Helper {
       res.send({ success: false, message: "Problem posting failed." });
     }
   };
-  static postEditorials = async (req, res) => {
+  static postEditorial = async (req, res) => {
     let title = req.body.title;
     let author_email = req.body.author;
     let content = req.body.content;
@@ -300,27 +339,7 @@ export default class Helper {
       res.send({ success: false });
     }
   };
-  static commentBlog = async (req, res) => {
-    let comment = req.body.comment;
-    let email = req.body.email;
-    let date = req.body.date;
-    let time = req.body.time;
-    let blogId = req.body.blogId;
-    const data = await adminDB.updateOne(
-      adminDB.blog,
-      { _id: new ObjectId(blogId) },
-      {
-        $push: {
-          comments: { comment: comment, email: email, date: date, time: time },
-        },
-      }
-    );
-    if (data) {
-      res.send({ success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
+  
   static submitSolution = async (req, res) => {
     let problemId = req.body.problemId;
     let code = req.body.code;
@@ -357,7 +376,7 @@ export default class Helper {
     }
   };
   static getBlogs = async (_req, res) => {
-    const data = await adminDB.find(adminDB.blog, {});
+    const data = await adminDB.find(adminDB.blog,sort={"timestamp":-1});
     if (data) {
       res.send({ data: data, success: true });
     } else {
