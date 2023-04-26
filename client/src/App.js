@@ -6,10 +6,14 @@ import SignIn from './components_login/SignIn';
 import SignUp from './components_login/SignUp';
 import MainPage from './components_student/MainPage';
 import Profile from './components/profile/Profile';
+import ViewProblems from './components_problem/problemPage/ViewProblems';
+import ViewAProblem from '../src/components_problem/problemPage/ViewAProblem';
+
+
 function App() {
   return (
     <>
-    
+
       <Routes>
         <Route path='/' element={<LandingPage />} />
         <Route path='/meetTheTeam'
@@ -60,6 +64,20 @@ function App() {
 
         </Route>
 
+        <Route path='/problem'>
+          <Route index
+            element={
+              <>
+                <NavBar />
+                <ViewProblems />
+              </>
+            }
+          />
+          <Route path=':id' element={<>
+            <NavBar />
+            <ViewAProblem />
+          </>} />
+        </Route>
       </Routes>
     </>
 
