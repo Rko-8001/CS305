@@ -5,9 +5,11 @@ import { Routes, Route } from 'react-router-dom';
 import SignIn from './components_login/SignIn';
 import SignUp from './components_login/SignUp';
 import MainPage from './components_student/MainPage';
+import Profile from './components/profile/Profile';
 function App() {
   return (
     <>
+    
       <Routes>
         <Route path='/' element={<LandingPage />} />
         <Route path='/meetTheTeam'
@@ -39,12 +41,25 @@ function App() {
           </>
         } />
 
-        <Route path='/student' element={
-          <>
-            <NavBar />
-            <MainPage />
-          </>
-        } />
+        <Route path='/student'>
+          <Route index
+            element={
+              <>
+                <NavBar />
+                <MainPage />
+              </>
+            } />
+
+          <Route path='profile'
+            element={
+              <>
+                <NavBar />
+                <Profile />
+              </>
+            } />
+
+        </Route>
+
       </Routes>
     </>
 

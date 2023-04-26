@@ -1,19 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
+import { getRoleToken } from '../../components_login/Token';
 
+const publicRoutes = [
+    { name: "Home", link: "/" },
+    { name: "User Guide", link: "/" },
+    { name: "Team", link: "/meetTheTeam" },
+    { name: "Sign In", link: "/signin" },
+    { name: "Sign Up", link: "/signup" },
+]
+const studentRoutes = [
+    { name: "Home", link: "/student" },
+    { name: "Profile", link: "/student/profile" },
+    { name: "Logout", link: "/" },
+]
+const adminRoutes = [
+    { name: "Home", link: "/admin" },
+    { name: "Logout", link: "/" },
+]
+const coordinatorRoutes = [
+    { name: "Home", link: "/admin" },
+    { name: "Logout", link: "/" },
+]
 function NavBar() {
 
     const [open, setOpen] = useState(false);
     const [openClass, setOpenClass] = useState("opacity-0 -translate-x-full");
 
-    const publicRoutes = [
-        { name: "Home", link: "/" },
-        { name: "User Guide", link: "/" },
-        { name: "Team", link: "/meetTheTeam" },
-        { name: "Sign In", link: "/signin" },
-        { name: "Sign Up", link: "/signup" },
+    const [routes, setRoutes] = useState(publicRoutes);
 
-    ]
+    useEffect(() => {
+
+        const role = getRoleToken();
+        if (role === "0")
+            setRoutes(studentRoutes);
+        else if (role === "1")
+            setRoutes(coordinatorRoutes);
+        else if (role === "2")
+            setRoutes(adminRoutes);
+    }, [])
+
+
     return (
         <>
             <nav x-data={open} className="relative bg-black text-white shadow ">
@@ -51,7 +78,7 @@ function NavBar() {
                         <div x-cloak
                             className={` ${openClass} absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out  lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center`}>
                             <div className="flex flex-col -mx-6 lg:flex-row lg:items-center lg:mx-8">
-                                {publicRoutes.map((item, index) =>
+                                {routes.map((item, index) =>
                                     <Link to={item.link} key={index} className="px-3 py-2 mx-3 mt-2 text-white hover:text-black hover:bg-white transition-colors duration-300 transform rounded-md lg:mt-0 ">
                                         {item.name}
                                     </Link>
