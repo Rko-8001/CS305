@@ -1,6 +1,6 @@
 class problem {
     constructor(obj) {
-        this.author_email = obj.author_email; // string
+        this.author_handle = obj.author_handle; // string
         this.title = obj.title; // string
         this.content = obj.content; // string
         this.correct_code_CPP = obj.correct_code_CPP; // string
@@ -16,7 +16,6 @@ class problem {
         this.input_template_JAVA = obj.input_template_JAVA // string
         this.testcases = obj.test_cases_input; // string
         this.timestamp = obj.timestamp; // DATE
-        this.language = obj.language; // string
         this.tags = obj.tags; // array of strings
         this.level = obj.level; // easy / medium / hard 
         this.status = "pending"

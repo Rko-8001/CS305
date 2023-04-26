@@ -30,7 +30,7 @@ async function main() {
     app.post("/postEditorials",Helper.postEditorials);
     app.post("/commentBlog",Helper.commentBlog);
     app.post("/submitSolution",Helper.submitSolution);
-    app.post("/getEditorials",Helper.getEditorials);
+    // app.post("/getEditorials",Helper.getEditorials);
     app.post("/getBlogs",Helper.getBlogs);
     app.post("/fetchBlogComments",Helper.fetchBlogComments);
     app.post("/fetchProblemSets",Helper.fetchProblemSets);

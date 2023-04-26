@@ -19,7 +19,7 @@ export default class database {
     this.problem = db.collection("Problems");
     this.blog = db.collection("Blogs");
     this.editorials = db.collection("Editorials");
-    this.submittedSolutions = db.collection("SubmittedSolutions");
+    this.solution = db.collection("SubmittedSolutions");
   }
   async findOne(collection, obj, fields = null) {
     return await collection.findOne(obj, { projection: fields });
