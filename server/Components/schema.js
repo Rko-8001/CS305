@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 class problem {
     constructor(obj) {
         this.author_email = obj.author_email; // string
@@ -45,4 +47,14 @@ class comments {
     }
 }
 
-export { problem, blog,comments};
+class editorial extends blog{
+    constructor(obj)
+    {
+        super(obj);
+        this.problem_id = new ObjectId(obj.problem_id);
+        this.Cppcode = obj.CPPcode;
+        this.Javacode = obj.Javacode;
+        delete this.title;
+    }
+}
+export { problem, blog,comments,editorial};

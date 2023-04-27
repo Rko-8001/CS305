@@ -21,6 +21,7 @@ async function main() {
     app.post("/verifyOTP",Helper.verifyOTP);
     app.post("/fillDetails",Helper.fillDetails);
     app.post("/userLogin",Helper.userLogin);
+    app.get("/getUserDetails",Helper.getUserDetails);
     app.post("/updateProfile",Helper.updateProfile);
     app.post("/getPostRequest",Helper.getPostRequest);
     app.post("/verifyPostRequest",Helper.verifyPostRequest);
@@ -28,10 +29,10 @@ async function main() {
     app.post("/postBlog",Helper.postBlog);
     app.post("/postProblem",Helper.postProblem);
     app.post("/postEditorial",Helper.postEditorial);
-    app.post("/commentBlog",Helper.commentBlog);
+    app.post("/commentBlog",Helper.comment);
     app.post("/submitSolution",Helper.submitSolution);
-    app.post("/getEditorials",Helper.getEditorials);
-    app.post("/getBlogs",Helper.getBlogs);
+    app.get("/getEditorial",Helper.getEditorial);
+    app.get("/getBlogs",Helper.getBlogs);
     app.post("/fetchBlogComments",Helper.fetchBlogComments);
     app.post("/fetchProblemSets",Helper.fetchProblemSets);
     app.post("/getProblemDetails",Helper.getProblemDetails);
