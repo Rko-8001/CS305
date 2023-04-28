@@ -6,6 +6,7 @@ import cors from "cors";
 import {adminDB} from "./Utility/admin.js";
 import Helper from "./Response/helper.js";
 import User from "./Response/user.js"
+import Blog from "./Response/blog.js"
 
 
 const app = express();
@@ -27,16 +28,13 @@ async function main() {
     app.post("/userLogout",User.userLogout);
     app.post("/changePassword",User.changePassword);
     app.get("/getAllHandles",User.getAllHandles);
-    app.post("/getPostRequest",Helper.getPostRequest);
-    app.post("/verifyPostRequest",Helper.verifyPostRequest);
-    app.post("/verifyPostRequest",Helper.verifyPostRequest);
-    app.post("/postBlog",Helper.postBlog);
+    app.post("/postBlog",Blog.postBlog);
     app.post("/postProblem",Helper.postProblem);
-    app.post("/postEditorial",Helper.postEditorial);
-    app.post("/commentBlog",Helper.comment);
+    app.post("/postEditorial",Blog.postEditorial);
+    app.post("/comment",Blog.comment);
     app.post("/submitSolution",Helper.submitSolution);
-    app.get("/getEditorial",Helper.getEditorial);
-    app.get("/getBlogs",Helper.getBlogs);
+    app.get("/getEditorial",Blog.getEditorial);
+    app.get("/getBlogs",Blog.getBlogs);
     app.post("/fetchBlogComments",Helper.fetchBlogComments);
     app.post("/fetchProblemSets",Helper.fetchProblemSets);
     app.post("/getProblemDetails",Helper.getProblemDetails);

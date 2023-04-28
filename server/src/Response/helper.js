@@ -11,101 +11,7 @@ import fs from 'fs';
 
 export default class Helper {
   
- 
-  static getPostRequest = async (_req, res) => {
-    const data = await adminDB.find(adminDB.problem, {
-      status: "pending",
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
-  static verifyPostRequest = async (req, res) => {
-    let postId = req.body.postId;
-    let response = req.body.response;
-    const data = await adminDB.updateOne(
-      adminDB.problem,
-      {
-        _id: new ObjectId(postId),
-      },
-      {
-        status: response,
-      }
-    );
-    if (data) {
-      res.send({ success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
-  static postBlog = async (req, res) => {
-    try {
-      // working fine
-      let token = req.body.userToken;
-      let decodeData = adminJWT.verifyToken(token);
-      let handle = decodeData.handle;
-      let type = decodeData.type;
-      let Blog = new blog(req.body);
-      Blog.handle = handle;
-      Blog.type = type;
-      Blog.comments = [];
-      const data = await adminDB.insertOne(adminDB.blog, Blog);
-      if (data) {
-        res.send({ success: true,message:"Blog posted." });
-      } else {
-        res.send({ success: false,message:"Blog cannot be posted due to internal error." });
-      }
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
-        console.log('Token has expired');
-        res.send({success:false,message:"Token has expired."})
-      } else {
-        // handle other errors here
-        console.log('Error:', error);
-        res.send({success:false,message:"Blog posting failed."})
-      }
-    }
-  }; // working fine
-  static comment = async (req, res) => {
-    try {
-      let token = req.body.userToken;
-      let decodeData = adminJWT.verifyToken(token);
-      let Id = req.body.Id;
-      let entityType = req.body.entityType;
-      let handle = decodeData.handle;
-      let comment = req.body.comment;
-      let timestamp = req.body.timestamp;
-      let Comment = new comments({handle:handle,comment:comment,timestamp:timestamp});
-      const data = await adminDB.updateOne(
-        entityType === 0 ? adminDB.blog : adminDB.editorials,
-        { _id: new ObjectId(Id) },
-        {
-          $push: {
-            comments: Comment,
-          },
-        }
-        );
-        console.log(data);
-      if (data.modifiedCount === 1) {
-        res.send({ success: true,message:"Comment posted." });
-      } else {
-        res.send({ success: false,message:"Comment cannot be posted due to internal error." });
-      }
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
-        console.log('Token has expired');
-        res.send({success:false,message:"Token has expired."})
-      } else {
-        // handle other errors here
-        console.log('Error:', error);
-        res.send({success:false,message:"Comment cannot be posted due to internal error."})
-      } 
-    }
-  }; // working fine
+  
   static postProblem = async (req, res) => {
     // working fine
     // only need changes in the problem object
@@ -136,43 +42,6 @@ export default class Helper {
       res.send({ success: false, message: "Problem posting failed." });
     }
   }; 
-  static postEditorial = async (req, res) => {
-    try {
-      // working fine
-      let token = req.body.userToken;
-      let decodeData = adminJWT.verifyToken(token);
-      let handle = decodeData.handle;
-      let type = decodeData.type;
-      let Editorial = new editorial(req.body);
-      Editorial.handle = handle;
-      Editorial.type = type;
-      if(Editorial.type === "0")
-        {
-          res.send({success:false,message:"You are not authorized to post editorials."});
-          return;
-        }
-      Editorial.comments = [];
-      const data = await adminDB.insertOne(adminDB.editorials, Editorial);
-      if (data) {
-        res.send({ success: true,message:"Editorial posted." });
-      } else {
-        res.send({ success: false,message:"Editorial cannot be posted due to internal error." });
-      }
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
-        console.log('Token has expired');
-        res.send({success:false,message:"Token has expired."})
-      } else {
-        // handle other errors here
-        console.log('Error:', error);
-        res.send({success:false,message:"Editorial posting failed."})
-      }
-    }
-  }; // working fine
-
-
-  
   static submitSolution = async (req, res) => {
     let problemId = req.body.problemId;
     let code = req.body.code;
@@ -982,27 +851,8 @@ export default class Helper {
     }
 
 };
-  static getEditorial = async (req, res) => {
-    // working fine
-    let problemId = req.body.problemId;
-    const data = await adminDB.findOne(adminDB.editorial, {
-      problemId: new ObjectId(problemId),
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
-  static getBlogs = async (_req, res) => {
-    // working fine
-    const data = await adminDB.find(adminDB.blog,{},{"timestamp":-1});
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
+  
+  
   static fetchBlogComments = async (req, res) => {
     let blogId = req.body.blogId;
     const data = await adminDB.findOne(adminDB.blog, {

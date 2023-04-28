@@ -50,7 +50,7 @@ class editorial extends blog{
     constructor(obj)
     {
         super(obj);
-        this.problem_id = new ObjectId(obj.problem_id);
+        this.problemId = new ObjectId(obj.problemId);
         this.Cppcode = obj.CPPcode;
         this.Javacode = obj.Javacode;
         delete this.title;
