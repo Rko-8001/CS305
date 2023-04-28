@@ -3,8 +3,9 @@ import express, { json } from "express";
 import cors from "cors";
 
 
-import {adminDB} from "./admin.js";
-import Helper from "./helper.js";
+import {adminDB} from "./Utility/admin.js";
+import Helper from "./Response/helper.js";
+import User from "./Response/user.js"
 
 
 const app = express();
@@ -17,12 +18,15 @@ async function main() {
   app.listen(process.env.NODE_PORT, () => {
     console.log(`Server is running on port: ${process.env.NODE_PORT}`);
   });
-    app.post("/sendOTP",Helper.sendOTP);
-    app.post("/verifyOTP",Helper.verifyOTP);
-    app.post("/fillDetails",Helper.fillDetails);
-    app.post("/userLogin",Helper.userLogin);
-    app.get("/getUserDetails",Helper.getUserDetails);
-    app.post("/updateProfile",Helper.updateProfile);
+    app.post("/sendOTP",User.sendOTP);
+    app.post("/verifyOTP",User.verifyOTP);
+    app.post("/fillDetails",User.fillDetails);
+    app.post("/userLogin",User.userLogin);
+    app.get("/getUserDetails",User.getUserDetails);
+    app.post("/updateProfile",User.updateProfile);
+    app.post("/userLogout",User.userLogout);
+    app.post("/changePassword",User.changePassword);
+    app.get("/getAllHandles",User.getAllHandles);
     app.post("/getPostRequest",Helper.getPostRequest);
     app.post("/verifyPostRequest",Helper.verifyPostRequest);
     app.post("/verifyPostRequest",Helper.verifyPostRequest);

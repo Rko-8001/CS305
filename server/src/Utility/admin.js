@@ -1,6 +1,6 @@
-import database from "./Components/DataPart/database.js";
-import Email from "./Components/email.js";
-import JWT from "./Components/jwt.js";
+import database from "../DataPart/database.js";
+import Email from "./email.js";
+import JWT from "./jwt.js";
 import dotenv from "dotenv";
 dotenv.config();
 const adminDB = new database(process.env.DB_URI, process.env.DB_NAME);
