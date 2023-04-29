@@ -226,4 +226,41 @@ describe("database", () => {
         expect(docs[0].age).to.not.exist;
       });
     });
+    
+    describe('update', () => {
+      let testDatabase;
+      let mongoserver;
+      let uri;
+      before(async () => {
+        // Create a test collection and insert some documents
+        mongoserver = await MongoMemoryServer.create();
+        uri = mongoserver.getUri();
+        let databaseName = "test";
+        testDatabase = new database(uri,databaseName);
+        await testDatabase.client.connect();
+        testDatabase.users = testDatabase.client.db(testDatabase.database).collection('users');
+        await testDatabase.users.insertMany([
+          { name: 'user1', age: 21,hobby:[] },
+          { name: 'user2', age: 22 ,hobby:[]},
+          { name: 'user3', age: 23 ,hobby:[]},
+        ]);
+      });
+      after(async() => {
+        await testDatabase.client.close();
+          await mongoserver.stop();
+        });
+      it('should set some values to all the documents with the required filter', async () => {
+        const docs = await testDatabase.update(testDatabase.users, {  }, { $set: { age:50 } });
+        console.log(docs)
+        expect(docs.modifiedCount).to.equal(3);
+      });
+  
+      it('should push values in ana array to all the documents with the required filter', async () => {
+        const docs = await testDatabase.update(testDatabase.users, { age: {$gt:21} }, { $push: { hobby:"newHobby" } });
+        expect(docs.modifiedCount).to.equal(3);
+      });
+  
+ 
+    });
+
   });

@@ -35,7 +35,7 @@ export default class database {
     return await collection.updateOne(filter, obj);
   }
   async update(collection, filter, obj) {
-    return await collection.update(filter, obj);
+    return await collection.updateMany(filter, obj);
   }
   async deleteOne(collection, obj) {
     return await collection.deleteOne(obj);
