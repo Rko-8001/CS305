@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import sinon from "sinon";
-import Email from "../Components/email.js";
+import Email from "../src/Utility/email.js";
 import nodemailer from "nodemailer";
 import nodemailerMock from "nodemailer-mock-transport";
 import { describe } from "mocha";
