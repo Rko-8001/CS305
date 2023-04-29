@@ -1,14 +1,14 @@
 {
   "stats": {
-    "suites": 9,
-    "tests": 8,
-    "passes": 8,
+    "suites": 10,
+    "tests": 12,
+    "passes": 12,
     "pending": 0,
     "failures": 0,
-    "start": "2023-04-29T15:17:36.333Z",
-    "end": "2023-04-29T15:17:36.729Z",
-    "duration": 396,
-    "testsRegistered": 8,
+    "start": "2023-04-29T16:31:23.086Z",
+    "end": "2023-04-29T16:31:23.711Z",
+    "duration": 625,
+    "testsRegistered": 12,
     "passPercent": 100,
     "pendingPercent": 0,
     "other": 0,
@@ -18,7 +18,7 @@
   },
   "results": [
     {
-      "uuid": "3a33c45a-82b7-4019-a69b-f22d4b419038",
+      "uuid": "ca83a3e8-f6e5-4bdf-aa8c-280f4d55799a",
       "title": "",
       "fullFile": "",
       "file": "",
@@ -27,7 +27,7 @@
       "tests": [],
       "suites": [
         {
-          "uuid": "4d17e4d8-86f9-4a3a-9915-64b111a1f2eb",
+          "uuid": "a7c1aa3c-b0e6-47b4-9a9d-e1481683bf52",
           "title": "database",
           "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
           "file": "/test/database.test.js",
@@ -36,7 +36,7 @@
           "tests": [],
           "suites": [
             {
-              "uuid": "c4a06ce2-ee0e-4b3f-8040-75f00719d636",
+              "uuid": "218a9889-b10d-49e0-85fb-1a401cc1dff9",
               "title": "connect",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
               "file": "/test/database.test.js",
@@ -45,7 +45,7 @@
                   "title": "\"before each\" hook in \"connect\"",
                   "fullTitle": "database connect \"before each\" hook in \"connect\"",
                   "timedOut": false,
-                  "duration": 65,
+                  "duration": 61,
                   "state": null,
                   "speed": null,
                   "pass": false,
@@ -54,8 +54,8 @@
                   "context": null,
                   "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();  \ntestDatabase = new database(uri,databaseName);",
                   "err": {},
-                  "uuid": "5fddc69e-752a-473b-a687-27afca190c6e",
-                  "parentUUID": "c4a06ce2-ee0e-4b3f-8040-75f00719d636",
+                  "uuid": "0a36ff17-cac6-437e-a526-9ac59467c5f4",
+                  "parentUUID": "218a9889-b10d-49e0-85fb-1a401cc1dff9",
                   "isHook": true,
                   "skipped": false
                 }
@@ -65,7 +65,7 @@
                   "title": "\"after each\" hook in \"connect\"",
                   "fullTitle": "database connect \"after each\" hook in \"connect\"",
                   "timedOut": false,
-                  "duration": 11,
+                  "duration": 25,
                   "state": null,
                   "speed": null,
                   "pass": false,
@@ -74,8 +74,8 @@
                   "context": null,
                   "code": "await mongoserver.stop();",
                   "err": {},
-                  "uuid": "6eb4f8d2-b2d5-430e-86de-a631cc073f16",
-                  "parentUUID": "c4a06ce2-ee0e-4b3f-8040-75f00719d636",
+                  "uuid": "324e7fe7-e476-4b45-b0fd-6fd5b2ed4bbe",
+                  "parentUUID": "218a9889-b10d-49e0-85fb-1a401cc1dff9",
                   "isHook": true,
                   "skipped": false
                 }
@@ -85,7 +85,7 @@
                   "title": "should connect to the database",
                   "fullTitle": "database connect should connect to the database",
                   "timedOut": false,
-                  "duration": 5,
+                  "duration": 7,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -94,246 +94,15 @@
                   "context": null,
                   "code": "const consoleSpy = spy(console,\"log\");\nconst dbMock = {collection : stub()} // mock database collection\nconst clientMock = {\n    connect : stub().resolves() //returns a resolved promise (Which stimulates the condition when database is connected)\n, db : stub().returns(dbMock)}; //returns a mock database\ntestDatabase.client = clientMock;\nawait testDatabase.connect();\nexpect(clientMock.connect.calledOnce).to.be.true;\nexpect(consoleSpy.calledOnce).to.be.true;\nexpect(consoleSpy.firstCall.args[0]).to.equal(\"DB Connection successful\");\nexpect(clientMock.db.calledWith(databaseName)).to.be.true;\nexpect(dbMock.collection.calledWith(\"Users\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"otp\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Problems\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Blogs\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Editorials\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"SubmittedSolutions\")).to.be.true;\nexpect(dbMock.collection.calledWith(\"Solved\")).to.be.true;\nconsoleSpy.restore();",
                   "err": {},
-                  "uuid": "207bc692-02b0-47a7-8eb8-70fc53c8d366",
-                  "parentUUID": "c4a06ce2-ee0e-4b3f-8040-75f00719d636",
+                  "uuid": "a0c04b15-b704-4c47-93a5-c22add08859d",
+                  "parentUUID": "218a9889-b10d-49e0-85fb-1a401cc1dff9",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "207bc692-02b0-47a7-8eb8-70fc53c8d366"
-              ],
-              "failures": [],
-              "pending": [],
-              "skipped": [],
-              "duration": 5,
-              "root": false,
-              "rootEmpty": false,
-              "_timeout": 2000
-            },
-            {
-              "uuid": "e257b919-1ada-455f-80d2-94c4d04b7e77",
-              "title": "findOne",
-              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
-              "file": "/test/database.test.js",
-              "beforeHooks": [
-                {
-                  "title": "\"before each\" hook in \"findOne\"",
-                  "fullTitle": "database findOne \"before each\" hook in \"findOne\"",
-                  "timedOut": false,
-                  "duration": 62,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
-                  "err": {},
-                  "uuid": "50aa2b60-be71-441b-8b89-ad5dfb2febb8",
-                  "parentUUID": "e257b919-1ada-455f-80d2-94c4d04b7e77",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "afterHooks": [
-                {
-                  "title": "\"after each\" hook in \"findOne\"",
-                  "fullTitle": "database findOne \"after each\" hook in \"findOne\"",
-                  "timedOut": false,
-                  "duration": 14,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
-                  "err": {},
-                  "uuid": "2ccb823c-0f65-4882-8beb-84b1ac8cac03",
-                  "parentUUID": "e257b919-1ada-455f-80d2-94c4d04b7e77",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "tests": [
-                {
-                  "title": "should return a document",
-                  "fullTitle": "database findOne should return a document",
-                  "timedOut": false,
-                  "duration": 13,
-                  "state": "passed",
-                  "speed": "fast",
-                  "pass": true,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21 };\nawait testDatabase.users.insertOne(doc);\n      \n// Call the findOne function with the query object\nconst query = { name: 'user' };\nconst fields = { age:21, _id:0 };\nconst result = await testDatabase.findOne(testDatabase.users, query, fields);\n      \n// Assert that the result matches the expected document\nexpect (result).to.be.an('object');\n  expect (result).to.deep.equal({ age:21 });",
-                  "err": {},
-                  "uuid": "2dd1c8fd-314e-4f9f-ada0-77d2bfcb3bf1",
-                  "parentUUID": "e257b919-1ada-455f-80d2-94c4d04b7e77",
-                  "isHook": false,
-                  "skipped": false
-                }
-              ],
-              "suites": [],
-              "passes": [
-                "2dd1c8fd-314e-4f9f-ada0-77d2bfcb3bf1"
-              ],
-              "failures": [],
-              "pending": [],
-              "skipped": [],
-              "duration": 13,
-              "root": false,
-              "rootEmpty": false,
-              "_timeout": 2000
-            },
-            {
-              "uuid": "51794353-9ce3-441a-a5f0-d4d973e9d08b",
-              "title": "insertOne",
-              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
-              "file": "/test/database.test.js",
-              "beforeHooks": [
-                {
-                  "title": "\"before each\" hook in \"insertOne\"",
-                  "fullTitle": "database insertOne \"before each\" hook in \"insertOne\"",
-                  "timedOut": false,
-                  "duration": 50,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
-                  "err": {},
-                  "uuid": "0c90735a-7de3-4543-afd0-2ecc56d07130",
-                  "parentUUID": "51794353-9ce3-441a-a5f0-d4d973e9d08b",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "afterHooks": [
-                {
-                  "title": "\"after each\" hook in \"insertOne\"",
-                  "fullTitle": "database insertOne \"after each\" hook in \"insertOne\"",
-                  "timedOut": false,
-                  "duration": 11,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
-                  "err": {},
-                  "uuid": "5542b6ee-dcbd-45a4-af14-b260e521e8c6",
-                  "parentUUID": "51794353-9ce3-441a-a5f0-d4d973e9d08b",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "tests": [
-                {
-                  "title": "should insert a document",
-                  "fullTitle": "database insertOne should insert a document",
-                  "timedOut": false,
-                  "duration": 3,
-                  "state": "passed",
-                  "speed": "fast",
-                  "pass": true,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21 };\nlet insertData = await testDatabase.insertOne(testDatabase.users,doc);\n  // Assert that the result matches the expected document\nexpect (insertData.acknowledged).to.equal(true);\nexpect (insertData.insertedId).to.not.equal(null | undefined);",
-                  "err": {},
-                  "uuid": "faa96e88-dba5-4034-878f-3aa7fa058d66",
-                  "parentUUID": "51794353-9ce3-441a-a5f0-d4d973e9d08b",
-                  "isHook": false,
-                  "skipped": false
-                }
-              ],
-              "suites": [],
-              "passes": [
-                "faa96e88-dba5-4034-878f-3aa7fa058d66"
-              ],
-              "failures": [],
-              "pending": [],
-              "skipped": [],
-              "duration": 3,
-              "root": false,
-              "rootEmpty": false,
-              "_timeout": 2000
-            },
-            {
-              "uuid": "1ce835d0-e7ad-4618-99c2-50a7cb331570",
-              "title": "updateOne",
-              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
-              "file": "/test/database.test.js",
-              "beforeHooks": [
-                {
-                  "title": "\"before each\" hook in \"updateOne\"",
-                  "fullTitle": "database updateOne \"before each\" hook in \"updateOne\"",
-                  "timedOut": false,
-                  "duration": 50,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
-                  "err": {},
-                  "uuid": "981dbf63-c6aa-41fd-bada-68a99a2dab76",
-                  "parentUUID": "1ce835d0-e7ad-4618-99c2-50a7cb331570",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "afterHooks": [
-                {
-                  "title": "\"after each\" hook in \"updateOne\"",
-                  "fullTitle": "database updateOne \"after each\" hook in \"updateOne\"",
-                  "timedOut": false,
-                  "duration": 15,
-                  "state": null,
-                  "speed": null,
-                  "pass": false,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
-                  "err": {},
-                  "uuid": "ee19ce61-5682-4371-ba20-1ad504d13457",
-                  "parentUUID": "1ce835d0-e7ad-4618-99c2-50a7cb331570",
-                  "isHook": true,
-                  "skipped": false
-                }
-              ],
-              "tests": [
-                {
-                  "title": "should return a document",
-                  "fullTitle": "database updateOne should return a document",
-                  "timedOut": false,
-                  "duration": 7,
-                  "state": "passed",
-                  "speed": "fast",
-                  "pass": true,
-                  "fail": false,
-                  "pending": false,
-                  "context": null,
-                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21,hobby : []};\nawait testDatabase.users.insertOne(doc);\n    \n// Call the findOne function with the query object\nlet query = { name: 'user' };\nlet result = await testDatabase.updateOne(testDatabase.users, query, {$set : {name: \"newUser\"}});\nexpect(result).to.be.an('object');\nexpect(result.acknowledged).to.equal(true);\nexpect(result.modifiedCount).to.equal(1);\nquery = { name: 'newUser' };\nresult = await testDatabase.updateOne(testDatabase.users, query, {$push : {hobby: \"newUser\"}});\nexpect(result).to.be.an('object');\nexpect(result.acknowledged).to.equal(true);\nexpect(result.modifiedCount).to.equal(1);",
-                  "err": {},
-                  "uuid": "1a4042a5-4838-4252-a391-1fbe86730272",
-                  "parentUUID": "1ce835d0-e7ad-4618-99c2-50a7cb331570",
-                  "isHook": false,
-                  "skipped": false
-                }
-              ],
-              "suites": [],
-              "passes": [
-                "1a4042a5-4838-4252-a391-1fbe86730272"
+                "a0c04b15-b704-4c47-93a5-c22add08859d"
               ],
               "failures": [],
               "pending": [],
@@ -344,16 +113,16 @@
               "_timeout": 2000
             },
             {
-              "uuid": "a3f8e812-1b0c-4f9a-bb4d-48d5a10526c0",
-              "title": "deleteOne",
+              "uuid": "380779c5-1738-48a1-8e0a-2f152419a2af",
+              "title": "findOne",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
               "file": "/test/database.test.js",
               "beforeHooks": [
                 {
-                  "title": "\"before each\" hook in \"deleteOne\"",
-                  "fullTitle": "database deleteOne \"before each\" hook in \"deleteOne\"",
+                  "title": "\"before each\" hook in \"findOne\"",
+                  "fullTitle": "database findOne \"before each\" hook in \"findOne\"",
                   "timedOut": false,
-                  "duration": 49,
+                  "duration": 85,
                   "state": null,
                   "speed": null,
                   "pass": false,
@@ -362,8 +131,239 @@
                   "context": null,
                   "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
                   "err": {},
-                  "uuid": "d6c7e5cb-5dff-4a00-ade1-74152ae5e7cd",
-                  "parentUUID": "a3f8e812-1b0c-4f9a-bb4d-48d5a10526c0",
+                  "uuid": "3e1b8144-7f04-4b22-8089-3921478ef362",
+                  "parentUUID": "380779c5-1738-48a1-8e0a-2f152419a2af",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after each\" hook in \"findOne\"",
+                  "fullTitle": "database findOne \"after each\" hook in \"findOne\"",
+                  "timedOut": false,
+                  "duration": 28,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
+                  "err": {},
+                  "uuid": "a2001668-97ec-4661-80c1-8c480dc7a888",
+                  "parentUUID": "380779c5-1738-48a1-8e0a-2f152419a2af",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should return a document",
+                  "fullTitle": "database findOne should return a document",
+                  "timedOut": false,
+                  "duration": 22,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21 };\nawait testDatabase.users.insertOne(doc);\n      \n// Call the findOne function with the query object\nconst query = { name: 'user' };\nconst fields = { age:21, _id:0 };\nconst result = await testDatabase.findOne(testDatabase.users, query, fields);\n      \n// Assert that the result matches the expected document\nexpect (result).to.be.an('object');\n  expect (result).to.deep.equal({ age:21 });",
+                  "err": {},
+                  "uuid": "e112159c-035c-4da9-b70b-9c3e2312164a",
+                  "parentUUID": "380779c5-1738-48a1-8e0a-2f152419a2af",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "e112159c-035c-4da9-b70b-9c3e2312164a"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 22,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "4fa8a77d-7472-4e52-a9c5-14d8ae415d40",
+              "title": "insertOne",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+              "file": "/test/database.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before each\" hook in \"insertOne\"",
+                  "fullTitle": "database insertOne \"before each\" hook in \"insertOne\"",
+                  "timedOut": false,
+                  "duration": 58,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
+                  "err": {},
+                  "uuid": "a2c777a1-bf9a-45e5-b0b8-b86f26cf22b2",
+                  "parentUUID": "4fa8a77d-7472-4e52-a9c5-14d8ae415d40",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after each\" hook in \"insertOne\"",
+                  "fullTitle": "database insertOne \"after each\" hook in \"insertOne\"",
+                  "timedOut": false,
+                  "duration": 26,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
+                  "err": {},
+                  "uuid": "11bef80b-1078-49e2-9146-364564b36b32",
+                  "parentUUID": "4fa8a77d-7472-4e52-a9c5-14d8ae415d40",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should insert a document",
+                  "fullTitle": "database insertOne should insert a document",
+                  "timedOut": false,
+                  "duration": 5,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21 };\nlet insertData = await testDatabase.insertOne(testDatabase.users,doc);\n  // Assert that the result matches the expected document\nexpect (insertData.acknowledged).to.equal(true);\nexpect (insertData.insertedId).to.not.equal(null | undefined);",
+                  "err": {},
+                  "uuid": "93a084dd-bdf9-4bca-9313-c6fc23244cb8",
+                  "parentUUID": "4fa8a77d-7472-4e52-a9c5-14d8ae415d40",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "93a084dd-bdf9-4bca-9313-c6fc23244cb8"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 5,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "932f1bc2-70d7-42d6-92c5-91b42c192ec1",
+              "title": "updateOne",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+              "file": "/test/database.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before each\" hook in \"updateOne\"",
+                  "fullTitle": "database updateOne \"before each\" hook in \"updateOne\"",
+                  "timedOut": false,
+                  "duration": 63,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
+                  "err": {},
+                  "uuid": "818811de-1776-4af7-9f6d-f298c8d5ed4e",
+                  "parentUUID": "932f1bc2-70d7-42d6-92c5-91b42c192ec1",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after each\" hook in \"updateOne\"",
+                  "fullTitle": "database updateOne \"after each\" hook in \"updateOne\"",
+                  "timedOut": false,
+                  "duration": 23,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
+                  "err": {},
+                  "uuid": "27a8629a-2a5b-46df-bb81-4f9ff67ca097",
+                  "parentUUID": "932f1bc2-70d7-42d6-92c5-91b42c192ec1",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should return a document",
+                  "fullTitle": "database updateOne should return a document",
+                  "timedOut": false,
+                  "duration": 13,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21,hobby : []};\nawait testDatabase.users.insertOne(doc);\n    \n// Call the findOne function with the query object\nlet query = { name: 'user' };\nlet result = await testDatabase.updateOne(testDatabase.users, query, {$set : {name: \"newUser\"}});\nexpect(result).to.be.an('object');\nexpect(result.acknowledged).to.equal(true);\nexpect(result.modifiedCount).to.equal(1);\nquery = { name: 'newUser' };\nresult = await testDatabase.updateOne(testDatabase.users, query, {$push : {hobby: \"newUser\"}});\nexpect(result).to.be.an('object');\nexpect(result.acknowledged).to.equal(true);\nexpect(result.modifiedCount).to.equal(1);",
+                  "err": {},
+                  "uuid": "ae64a1a5-11f1-473e-96a3-769564cd0ee1",
+                  "parentUUID": "932f1bc2-70d7-42d6-92c5-91b42c192ec1",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "ae64a1a5-11f1-473e-96a3-769564cd0ee1"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 13,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "e76abcba-1b99-4240-b75b-1f9f778eb568",
+              "title": "deleteOne",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+              "file": "/test/database.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before each\" hook in \"deleteOne\"",
+                  "fullTitle": "database deleteOne \"before each\" hook in \"deleteOne\"",
+                  "timedOut": false,
+                  "duration": 61,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "mongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.connect();",
+                  "err": {},
+                  "uuid": "b4f35049-5f68-45d8-8987-f0438ab78e3a",
+                  "parentUUID": "e76abcba-1b99-4240-b75b-1f9f778eb568",
                   "isHook": true,
                   "skipped": false
                 }
@@ -373,7 +373,7 @@
                   "title": "\"after each\" hook in \"deleteOne\"",
                   "fullTitle": "database deleteOne \"after each\" hook in \"deleteOne\"",
                   "timedOut": false,
-                  "duration": 13,
+                  "duration": 24,
                   "state": null,
                   "speed": null,
                   "pass": false,
@@ -382,8 +382,8 @@
                   "context": null,
                   "code": "await testDatabase.disconnect();\n  await mongoserver.stop();",
                   "err": {},
-                  "uuid": "666a184d-df3b-44e4-9823-33d7f6bd4122",
-                  "parentUUID": "a3f8e812-1b0c-4f9a-bb4d-48d5a10526c0",
+                  "uuid": "f5a4619f-6750-414c-bc89-06343784f946",
+                  "parentUUID": "e76abcba-1b99-4240-b75b-1f9f778eb568",
                   "isHook": true,
                   "skipped": false
                 }
@@ -393,7 +393,7 @@
                   "title": "should delete a document",
                   "fullTitle": "database deleteOne should delete a document",
                   "timedOut": false,
-                  "duration": 4,
+                  "duration": 5,
                   "state": "passed",
                   "speed": "fast",
                   "pass": true,
@@ -402,20 +402,154 @@
                   "context": null,
                   "code": "// Insert a document into the collection for testing\nconst doc = { name: 'user', age: 21};\nawait testDatabase.users.insertOne(doc);\n    \n// Call the findOne function with the query object\nlet query = { name: 'user' };\nlet result = await testDatabase.deleteOne(testDatabase.users, query);\nexpect(result).to.be.an('object');\nexpect(result.acknowledged).to.equal(true);\nexpect(result.deletedCount).to.equal(1);",
                   "err": {},
-                  "uuid": "32faaa4e-28d3-4d90-9f3d-511254c1f26c",
-                  "parentUUID": "a3f8e812-1b0c-4f9a-bb4d-48d5a10526c0",
+                  "uuid": "911975d2-447a-4eb2-8066-8cdd6044cb78",
+                  "parentUUID": "e76abcba-1b99-4240-b75b-1f9f778eb568",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "32faaa4e-28d3-4d90-9f3d-511254c1f26c"
+                "911975d2-447a-4eb2-8066-8cdd6044cb78"
               ],
               "failures": [],
               "pending": [],
               "skipped": [],
-              "duration": 4,
+              "duration": 5,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 2000
+            },
+            {
+              "uuid": "884c9e87-69e9-401c-a011-acba941b0ed4",
+              "title": "find",
+              "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/database.test.js",
+              "file": "/test/database.test.js",
+              "beforeHooks": [
+                {
+                  "title": "\"before all\" hook in \"find\"",
+                  "fullTitle": "database find \"before all\" hook in \"find\"",
+                  "timedOut": false,
+                  "duration": 64,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "// Create a test collection and insert some documents\nmongoserver = await MongoMemoryServer.create();\nuri = mongoserver.getUri();\nlet databaseName = \"test\";\ntestDatabase = new database(uri,databaseName);\nawait testDatabase.client.connect();\ntestDatabase.users = testDatabase.client.db(testDatabase.database).collection('users');\nawait testDatabase.users.insertMany([\n  { name: 'user1', age: 21 },\n  { name: 'user2', age: 22 },\n  { name: 'user3', age: 23 },\n]);",
+                  "err": {},
+                  "uuid": "af6c8cff-a5aa-4b4d-af87-640c52a858aa",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "afterHooks": [
+                {
+                  "title": "\"after all\" hook in \"find\"",
+                  "fullTitle": "database find \"after all\" hook in \"find\"",
+                  "timedOut": false,
+                  "duration": 18,
+                  "state": null,
+                  "speed": null,
+                  "pass": false,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "await testDatabase.client.close();\n  await mongoserver.stop();",
+                  "err": {},
+                  "uuid": "d5c4871a-64bd-45f8-a61a-1ae936b1f4b4",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": true,
+                  "skipped": false
+                }
+              ],
+              "tests": [
+                {
+                  "title": "should find all documents in the collection",
+                  "fullTitle": "database find should find all documents in the collection",
+                  "timedOut": false,
+                  "duration": 4,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const docs = await testDatabase.find(testDatabase.users);\nexpect(docs).to.have.lengthOf(3);",
+                  "err": {},
+                  "uuid": "7d2e917c-5f28-484c-833e-b1edc4dd3620",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should find documents with a query object",
+                  "fullTitle": "database find should find documents with a query object",
+                  "timedOut": false,
+                  "duration": 2,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const docs = await testDatabase.find(testDatabase.users, { name: 'user1' });\nexpect(docs).to.have.lengthOf(1);\nexpect(docs[0].name).to.equal('user1');",
+                  "err": {},
+                  "uuid": "4718fd68-5508-4b48-8627-be7d7b14d749",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should sort documents with a sort object",
+                  "fullTitle": "database find should sort documents with a sort object",
+                  "timedOut": false,
+                  "duration": 3,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const docs = await testDatabase.find(testDatabase.users, {}, { age: -1 });\nexpect(docs).to.have.lengthOf(3);\nexpect(docs[0].name).to.equal('user3');",
+                  "err": {},
+                  "uuid": "9fc8cc8f-acdc-4cfc-8727-e22edcb531ea",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should project documents with a fields object",
+                  "fullTitle": "database find should project documents with a fields object",
+                  "timedOut": false,
+                  "duration": 2,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "const docs = await testDatabase.find(testDatabase.users, {}, {}, { name: 1 });\nexpect(docs).to.have.lengthOf(3);\nexpect(docs[0].name).to.exist;\nexpect(docs[0].age).to.not.exist;",
+                  "err": {},
+                  "uuid": "930d3589-c5b7-4bee-a767-68fc563a23a9",
+                  "parentUUID": "884c9e87-69e9-401c-a011-acba941b0ed4",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "7d2e917c-5f28-484c-833e-b1edc4dd3620",
+                "4718fd68-5508-4b48-8627-be7d7b14d749",
+                "9fc8cc8f-acdc-4cfc-8727-e22edcb531ea",
+                "930d3589-c5b7-4bee-a767-68fc563a23a9"
+              ],
+              "failures": [],
+              "pending": [],
+              "skipped": [],
+              "duration": 11,
               "root": false,
               "rootEmpty": false,
               "_timeout": 2000
@@ -431,7 +565,7 @@
           "_timeout": 2000
         },
         {
-          "uuid": "7d711369-7329-4e13-b8e8-6dfa92bd7882",
+          "uuid": "f2b723b0-6445-46dd-aad1-647c4c7d275b",
           "title": "Email",
           "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
           "file": "/test/email.test.js",
@@ -440,7 +574,7 @@
           "tests": [],
           "suites": [
             {
-              "uuid": "693ac8a6-1d2d-4ec8-af6a-e8d6423d8e39",
+              "uuid": "705cdc2a-8c7e-46a5-b6c6-820a9da67e8e",
               "title": "sendMail",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
               "file": "/test/email.test.js",
@@ -458,8 +592,8 @@
                   "context": null,
                   "code": "transporter = nodemailer.createTransport(nodemailerMock());\nemail = new Email();\nemail.transporter = transporter;\nemail.sender = \"test92.test@gmail.com\";",
                   "err": {},
-                  "uuid": "36f2a237-9f1e-40a8-bb9a-ef71ef17ab47",
-                  "parentUUID": "693ac8a6-1d2d-4ec8-af6a-e8d6423d8e39",
+                  "uuid": "d91bc63b-424e-473b-9cc5-f0e2dd466ee2",
+                  "parentUUID": "705cdc2a-8c7e-46a5-b6c6-820a9da67e8e",
                   "isHook": true,
                   "skipped": false
                 }
@@ -478,8 +612,8 @@
                   "context": null,
                   "code": "sinon.restore();",
                   "err": {},
-                  "uuid": "78896aa4-a3df-4107-8f10-3515b40308af",
-                  "parentUUID": "693ac8a6-1d2d-4ec8-af6a-e8d6423d8e39",
+                  "uuid": "86353ac5-39d8-4e7f-8741-0d665d4097b1",
+                  "parentUUID": "705cdc2a-8c7e-46a5-b6c6-820a9da67e8e",
                   "isHook": true,
                   "skipped": false
                 }
@@ -498,8 +632,8 @@
                   "context": null,
                   "code": "// to track the sendMail function of the email.transporter\nconst sendMailSpy = sinon.spy(email.transporter, \"sendMail\");\nconst receiver = \"nish95.sha@gmail.com\";\nconst subject = \"Test Email\";\nconst text = \"This is a test email.\";\n// call the sendMail function of the email class\nemail.sendMail(receiver, subject, text);\nexpect(sendMailSpy.calledOnce).to.be.true;\nexpect(sendMailSpy.firstCall.args[0]).to.deep.equal({\n  from: email.sender,\n  to: receiver,\n  subject: subject,\n  text: text,\n});",
                   "err": {},
-                  "uuid": "f55ef8c3-5f67-45d7-99bd-04298dee86ee",
-                  "parentUUID": "693ac8a6-1d2d-4ec8-af6a-e8d6423d8e39",
+                  "uuid": "b910fea5-6d9b-41e5-9541-02fe0a890c2c",
+                  "parentUUID": "705cdc2a-8c7e-46a5-b6c6-820a9da67e8e",
                   "isHook": false,
                   "skipped": false
                 },
@@ -516,16 +650,16 @@
                   "context": null,
                   "code": "// mock the sendMail function of the email.transporter\nemail.transporter.sendMail = sinon\n  .stub()\n  .yields(\"Failed to send email.\");\n  // to call the callback function of the sendMail function with the error message\nconst receiver = \"recipient@example.com\";\nconst subject = \"Test email\";\nconst text = \"This is a test email.\";\nconst errorMessage = \"Failed to send email.\";\nexpect(() => {\n  email.sendMail(receiver, subject, text);\n}).to.throw(Error, errorMessage);",
                   "err": {},
-                  "uuid": "a69718d0-aaf8-45e2-8db9-69b6265e6668",
-                  "parentUUID": "693ac8a6-1d2d-4ec8-af6a-e8d6423d8e39",
+                  "uuid": "761b0711-3daa-4341-917f-3873fe2f5c42",
+                  "parentUUID": "705cdc2a-8c7e-46a5-b6c6-820a9da67e8e",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "f55ef8c3-5f67-45d7-99bd-04298dee86ee",
-                "a69718d0-aaf8-45e2-8db9-69b6265e6668"
+                "b910fea5-6d9b-41e5-9541-02fe0a890c2c",
+                "761b0711-3daa-4341-917f-3873fe2f5c42"
               ],
               "failures": [],
               "pending": [],
@@ -536,7 +670,7 @@
               "_timeout": 2000
             },
             {
-              "uuid": "49acfbbf-0074-4ce5-b784-912fe63e6100",
+              "uuid": "f15ed191-5b2a-4c7c-8d02-1f5ed4bfc9c7",
               "title": "sendOTP",
               "fullFile": "/home/nishant/Documents/6th sem/CS305/Final/Main Folder/server/test/email.test.js",
               "file": "/test/email.test.js",
@@ -554,8 +688,8 @@
                   "context": null,
                   "code": "transporter = nodemailer.createTransport(nodemailerMock());\nemail = new Email();\nemail.transporter = transporter;\nemail.sender = \"test92.test@gmail.com\";\nemail.sendMail = sinon.stub().resolves();",
                   "err": {},
-                  "uuid": "bc4729da-899d-4709-9ecb-52032b39104d",
-                  "parentUUID": "49acfbbf-0074-4ce5-b784-912fe63e6100",
+                  "uuid": "35c1b0cd-3dbc-4412-a05f-2ab65f4286f8",
+                  "parentUUID": "f15ed191-5b2a-4c7c-8d02-1f5ed4bfc9c7",
                   "isHook": true,
                   "skipped": false
                 }
@@ -574,8 +708,8 @@
                   "context": null,
                   "code": "sinon.restore();",
                   "err": {},
-                  "uuid": "1d729db3-e74f-4315-a5b7-d7744096d150",
-                  "parentUUID": "49acfbbf-0074-4ce5-b784-912fe63e6100",
+                  "uuid": "0073509c-0e7c-41f8-8f3e-77d057d38b27",
+                  "parentUUID": "f15ed191-5b2a-4c7c-8d02-1f5ed4bfc9c7",
                   "isHook": true,
                   "skipped": false
                 }
@@ -594,15 +728,15 @@
                   "context": null,
                   "code": "const receiver = \"nish95.sha@gmail.com\";\nconst otp = \"123456\";\nemail.sendOTP(receiver, otp);\nexpect(\n  email.sendMail.calledOnceWithExactly(\n    receiver,\n    \"OTP\",\n    `Your OTP is ${otp}`\n  )\n).to.be.true;",
                   "err": {},
-                  "uuid": "100e2736-5b7a-4438-b5cc-5cd2fee65025",
-                  "parentUUID": "49acfbbf-0074-4ce5-b784-912fe63e6100",
+                  "uuid": "5d526b5b-2123-46b1-954e-8ed9e56cf1a5",
+                  "parentUUID": "f15ed191-5b2a-4c7c-8d02-1f5ed4bfc9c7",
                   "isHook": false,
                   "skipped": false
                 }
               ],
               "suites": [],
               "passes": [
-                "100e2736-5b7a-4438-b5cc-5cd2fee65025"
+                "5d526b5b-2123-46b1-954e-8ed9e56cf1a5"
               ],
               "failures": [],
               "pending": [],

@@ -180,4 +180,50 @@ describe("database", () => {
 
       });
     });
+    describe('find', () => {
+      let testDatabase;
+      let mongoserver;
+      let uri;
+      before(async () => {
+        // Create a test collection and insert some documents
+        mongoserver = await MongoMemoryServer.create();
+        uri = mongoserver.getUri();
+        let databaseName = "test";
+        testDatabase = new database(uri,databaseName);
+        await testDatabase.client.connect();
+        testDatabase.users = testDatabase.client.db(testDatabase.database).collection('users');
+        await testDatabase.users.insertMany([
+          { name: 'user1', age: 21 },
+          { name: 'user2', age: 22 },
+          { name: 'user3', age: 23 },
+        ]);
+      });
+      after(async() => {
+        await testDatabase.client.close();
+          await mongoserver.stop();
+        });
+      it('should find all documents in the collection', async () => {
+        const docs = await testDatabase.find(testDatabase.users);
+        expect(docs).to.have.lengthOf(3);
+      });
+  
+      it('should find documents with a query object', async () => {
+        const docs = await testDatabase.find(testDatabase.users, { name: 'user1' });
+        expect(docs).to.have.lengthOf(1);
+        expect(docs[0].name).to.equal('user1');
+      });
+  
+      it('should sort documents with a sort object', async () => {
+        const docs = await testDatabase.find(testDatabase.users, {}, { age: -1 });
+        expect(docs).to.have.lengthOf(3);
+        expect(docs[0].name).to.equal('user3');
+      });
+  
+      it('should project documents with a fields object', async () => {
+        const docs = await testDatabase.find(testDatabase.users, {}, {}, { name: 1 });
+        expect(docs).to.have.lengthOf(3);
+        expect(docs[0].name).to.exist;
+        expect(docs[0].age).to.not.exist;
+      });
+    });
   });
