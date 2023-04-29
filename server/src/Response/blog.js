@@ -122,7 +122,7 @@ export default class Blog{
       }; // working fine
       static getBlogs = async (_req, res) => {
         try {
-            const data = await adminDB.find(adminDB.blog,{},{"timestamp":-1});
+            const data = await adminDB.find(adminDB.blog,{},{"timestamp":-1},{comments : 0});
             if (data) {
               res.send({ data: data, success: true,message:"Blogs sent successfully." });
             } else {
@@ -132,4 +132,19 @@ export default class Blog{
             res.send({ success: false,message:"Blogs could not be sent due to some internal error." });
         }
       }; // working fine
+      static getBlogComments = async (req,res) => {
+        try {
+          let blogId = req.body.blogId;
+          const data = await adminDB.findOne(adminDB.blog, {
+            _id: new ObjectId(blogId),
+          },{comments:1,_id:0});
+          if (data) {
+            res.send({ data: data.comments, success: true,message:"Comments sent successfully." });
+          } else {
+            res.send({ success: false,message:"Comments could not be sent due to some internal error." });
+          }
+        } catch (error) {
+          res.send({ success: false,message:"Comments could not be sent due to some internal error." });
+        }
+      } // working fine
 }
