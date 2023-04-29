@@ -1,5 +1,4 @@
 import { adminDB, adminJWT } from "../Utility/admin.js";
-import bcrypt from "bcrypt";
 import { problem } from "../DataPart/Model/schema.js";
 import pkg from "jsonwebtoken";
 import { ObjectId } from "mongodb";
@@ -1135,6 +1134,29 @@ export default class Problem {
         } else {
         res.send({ success: false, message: error.message });
         }
+    }
+  }; // working fine
+  static fetchAllProblems = async (req, res) => {
+    // fetch all the problems from the problem collection
+    try {
+        let data = await adminDB.find(adminDB.problem, {},{timestamp:-1},{title:1,timestamp:1});
+        res.send({ success: true, problems: data,message:"Problems fetched successfully" });
+        
+    } catch (error) {
+        res.send({ success: false, message: error.message });
+    }
+  }; // working fine
+  static fetchProblemDetails = async (req, res) => {
+    // fetch the problem details from the problem collection
+    let problemId = req.body.problemId;
+    try {
+        let data = await adminDB.findOne(adminDB.problem, {
+        _id: new ObjectId(problemId)
+        },{_id:0,correct_code_CPP:0,correct_code_JAVA:0,testcases:0});
+        res.send({ success: true, problem: data,message:"Problem details fetched successfully" });
+        
+    } catch (error) {
+        res.send({ success: false, message: error.message });
     }
   }; // working fine
 }

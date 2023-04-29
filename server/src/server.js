@@ -37,8 +37,8 @@ async function main() {
     app.get("/getBlogs",Blog.getBlogs);
     app.post("/fetchSolvedProblems",Problem.fetchSolvedProblems);
     app.post("/fetchAllSubmissions",Problem.fetchAllSubmissions);
-    // app.post("/fetchBlogComments",Problem.fetchBlogComments);
-    // app.post("/fetchProblemSets",Problem.fetchProblemSets);
+    app.get("/fetchAllProblems",Problem.fetchAllProblems);
+    app.post("/fetchProblemDetails",Problem.fetchProblemDetails);
     // app.post("/getProblemDetails",Problem.getProblemDetails);
     // app.post("/viewEditorials",Problem.viewEditorials);
     // app.post("/getVerdicts",Problem.viewEditorials);

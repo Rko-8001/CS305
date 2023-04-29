@@ -40,4 +40,8 @@ export default class database {
   async deleteOne(collection, obj) {
     return await collection.deleteOne(obj);
   }
+  async disconnect() {
+    await this.client.close();
+  }
+  
 }
