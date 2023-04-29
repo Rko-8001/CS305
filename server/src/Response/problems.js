@@ -9,9 +9,9 @@ import { readFileSync } from "fs";
 import { pack as _pack } from "tar-stream";
 import fs from "fs";
 
-export default class Helper {
+export default class Problem {
   static postProblem = async (req, res) => {
-    // only need changes in the problem object
+    // handle problem posting
     try {
       let token = req.body.userToken;
       let decodeData = adminJWT.verifyToken(token);
@@ -48,6 +48,7 @@ export default class Helper {
     }
   }; // working fine
   static submitSolution = async (req, res) => {
+    // handle problem submission
     try {
       let problemId = req.body.problemId;
       let token = req.body.userToken;
@@ -1070,59 +1071,70 @@ export default class Helper {
       }
     }
   }; // working fine
-
-  static fetchBlogComments = async (req, res) => {
-    let blogId = req.body.blogId;
-    const data = await adminDB.findOne(adminDB.blog, {
-      _id: new ObjectId(blogId),
-    });
-    if (data) {
-      res.send({ data: data.comments, success: true });
-    } else {
-      res.send({ success: false });
+  static fetchSolvedProblems = async (req, res) => {
+    // fetch the solved problems of the user from the solved collection
+    let token = req.body.userToken;
+    try {
+        let decoded = adminJWT.verifyToken(token);
+        let handle = decoded.handle;
+        const data = await adminDB.findOne(adminDB.solved, {
+        handle: handle},{problems:1,_id:0}
+        );
+        res.send({ success: true, problems: data.problems,message:"Solved problems fetched successfully" });
+        
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        console.log("Token has expired");
+        res.send({ success: false, message: "Token has expired." });
+        } else if (error instanceof JsonWebTokenError) {
+        // handle other errors here
+        res.send({
+            success: false,
+            message: "User has logged out.Kindly login again",
+        });
+        } else {
+        res.send({ success: false, message: error.message });
+        }
     }
-  };
-  static fetchProblemSets = async (_req, res) => {
-    const data = await adminDB.find(adminDB.problem, {
-      status: "accepted",
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
+  }; // working fine
+  static fetchAllSubmissions = async (req, res) => {
+    // fetch all the submissions of the user from the solution collection
+    let token = req.body.token;
+    try {
+        let decoded = adminJWT.verifyToken(token);
+        let handle = decoded.handle;
+        let data = await adminDB.find(adminDB.solution, {
+        handle: handle
+        });
+        if(data.length > 0){
+            let problems = data.map(item => new ObjectId(item.problemId));
+            const problemData = await adminDB.find(adminDB.problem, {
+                _id: { $in: problems }
+            },{},{title:1});
+            console.log(problemData);
+            data = data.map(item => {
+                let problem = problemData.find(problem => problem._id.toString() === item.problemId.toString());
+                return {
+                    ...item,title:problem.title
+                }
+            });
+        }
+        res.send({ success: true, submissions: data,message:"Submissions fetched successfully" });
+        
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        res.send({ success: false, message: "Token has expired." });
+        } else if (error instanceof JsonWebTokenError) {
+        // handle other errors here
+        res.send({
+            success: false,
+            message: "User has logged out.Kindly login again",
+        });
+        } else {
+        res.send({ success: false, message: error.message });
+        }
     }
-  };
-  static getProblemDetails = async (req, res) => {
-    let problemId = req.body.problemId;
-    const data = await adminDB.findOne(adminDB.problem, {
-      _id: new ObjectId(problemId),
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
-  static viewEditorials = async (req, res) => {
-    let problemId = req.body.problemlId;
-    const data = await adminDB.findOne(adminDB.editorial, {
-      _id: new ObjectId(problemId),
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
-  static getVerdict = async (req, res) => {
-    let problemId = req.body.problemId;
-    const data = await adminDB.find(adminDB.solution, {
-      problemId: problemId,
-    });
-    if (data) {
-      res.send({ data: data, success: true });
-    } else {
-      res.send({ success: false });
-    }
-  };
+  }; // working fine
 }

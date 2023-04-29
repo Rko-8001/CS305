@@ -157,6 +157,7 @@ export default class User {
               birthdate: null, // date of birth of the format YYYY-MM-DD
               address: null, // complete address
             });
+            adminDB.insertOne(adminDB.solved,{handle: handle, solved:[]});
             res.send({
                 success: true,
                 message: "User Registered Successfully",

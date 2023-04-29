@@ -4,7 +4,7 @@ import cors from "cors";
 
 
 import {adminDB} from "./Utility/admin.js";
-import Helper from "./Response/helper.js";
+import Problem from "./Response/problems.js";
 import User from "./Response/user.js"
 import Blog from "./Response/blog.js"
 
@@ -29,17 +29,19 @@ async function main() {
     app.post("/changePassword",User.changePassword);
     app.get("/getAllHandles",User.getAllHandles);
     app.post("/postBlog",Blog.postBlog);
-    app.post("/postProblem",Helper.postProblem);
+    app.post("/postProblem",Problem.postProblem);
     app.post("/postEditorial",Blog.postEditorial);
     app.post("/comment",Blog.comment);
-    app.post("/submitSolution",Helper.submitSolution);
+    app.post("/submitSolution",Problem.submitSolution);
     app.get("/getEditorial",Blog.getEditorial);
     app.get("/getBlogs",Blog.getBlogs);
-    app.post("/fetchBlogComments",Helper.fetchBlogComments);
-    app.post("/fetchProblemSets",Helper.fetchProblemSets);
-    app.post("/getProblemDetails",Helper.getProblemDetails);
-    app.post("/viewEditorials",Helper.viewEditorials);
-    app.post("/getVerdicts",Helper.viewEditorials);
+    app.post("/fetchSolvedProblems",Problem.fetchSolvedProblems);
+    app.post("/fetchAllSubmissions",Problem.fetchAllSubmissions);
+    // app.post("/fetchBlogComments",Problem.fetchBlogComments);
+    // app.post("/fetchProblemSets",Problem.fetchProblemSets);
+    // app.post("/getProblemDetails",Problem.getProblemDetails);
+    // app.post("/viewEditorials",Problem.viewEditorials);
+    // app.post("/getVerdicts",Problem.viewEditorials);
     // fetchUserInfo
 }
 main();
