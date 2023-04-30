@@ -1,4 +1,3 @@
-import { adminDB, adminJWT } from "../Utility/admin.js";
 import { problem } from "../DataPart/Model/schema.js";
 import pkg from "jsonwebtoken";
 import { ObjectId } from "mongodb";
@@ -9,11 +8,15 @@ import { pack as _pack } from "tar-stream";
 import fs from "fs";
 
 export default class Problem {
-  static postProblem = async (req, res) => {
+  constructor(adminDB,adminJWT){
+    this.adminDB = adminDB;
+    this.adminJWT = adminJWT;
+  }
+   postProblem = async (req, res) => {
     // handle problem posting
     try {
       let token = req.body.userToken;
-      let decodeData = adminJWT.verifyToken(token);
+      let decodeData = this.adminJWT.verifyToken(token);
       let author_handle = decodeData.handle;
       let author_type = decodeData.type;
       if (author_type !== "2") {
@@ -27,7 +30,7 @@ export default class Problem {
       let obj = { ...req.body, author_handle: author_handle };
       obj.token = undefined;
       let Problem = new problem(obj);
-      const data = await adminDB.insertOne(adminDB.problem, Problem);
+      const data = await this.adminDB.insertOne(this.adminDB.problem, Problem);
       if (data) {
         res.send({ success: true, message: "Problem posted successfully." });
       } else {
@@ -46,12 +49,12 @@ export default class Problem {
       }
     }
   }; // working fine
-  static submitSolution = async (req, res) => {
+   submitSolution = async (req, res) => {
     // handle problem submission
     try {
       let problemId = req.body.problemId;
       let token = req.body.userToken;
-      let decodeData = adminJWT.verifyToken(token);
+      let decodeData = this.adminJWT.verifyToken(token);
       let code = req.body.code;
       let handle = decodeData.handle;
       let timestamp = req.body.timestamp;
@@ -69,7 +72,7 @@ export default class Problem {
           AttachStderr: true,
           Cmd: ["bash"],
         };
-        const problem = await adminDB.findOne(adminDB.problem, {
+        const problem = await this.adminDB.findOne(this.adminDB.problem, {
           _id: new ObjectId(problemId),
         });
 
@@ -100,13 +103,13 @@ export default class Problem {
           }
         );
         // Create and start container
-        docker.createContainer(containerOptions, function (err, container) {
+        docker.createContainer(containerOptions,  (err, container) =>{
           if (err) {
             console.error("Error creating container:", err);
             verdict = "Internal Error";
           }
 
-          container.start(function (err) {
+          container.start( (err)=> {
             if (err) {
               console.error("Error starting container:", err);
               verdict = "Internal Error";
@@ -142,7 +145,7 @@ export default class Problem {
             pack6.entry({ name: "cmain.cpp" }, fileContents6);
             pack6.finalize();
 
-            container.putArchive(pack, { path: "/" }, function (err) {
+            container.putArchive(pack, { path: "/" },  (err)=> {
               if (err) {
                 console.error("Error copying file to container:", err);
                 verdict = "Internal Error";
@@ -152,7 +155,7 @@ export default class Problem {
               container.putArchive(
                 pack2,
                 { path: "/" },
-                function (err) {
+                 (err)=> {
                   if (err) {
                     console.error("Error copying file to container:", err);
                     verdict = "Internal Error";
@@ -163,7 +166,7 @@ export default class Problem {
                 container.putArchive(
                   pack3,
                   { path: "/" },
-                  function (err) {
+                   (err)=> {
                     if (err) {
                       console.error("Error copying file to container:", err);
                       verdict = "Internal Error";
@@ -190,7 +193,7 @@ export default class Problem {
                   container.putArchive(
                     pack6,
                     { path: "/" },
-                    function (err) {
+                     (err)=> {
                       if (err) {
                         console.error("Error copying file to container:", err);
                         verdict = "Internal Error";
@@ -209,26 +212,26 @@ export default class Problem {
                         AttachStdout: true,
                         AttachStderr: true,
                       },
-                      function (err, exec) {
+                       (err, exec) =>{
                         if (err) {
                           console.error("Error creating exec:", err);
                           verdict = "Internal Error";
                         }
 
-                        exec.start(function (err, stream) {
+                        exec.start( (err, stream)=> {
                           if (err) {
                             console.error("Error starting exec:", err);
                             verdict = "Internal Error";
                           }
 
-                          stream.on("data", function (data) {
+                          stream.on("data",  (data)=> {
                             console.log(data.toString());
                             if (verdict == "") {
                               verdict = "Compilation Error";
                             }
                           });
 
-                          stream.on("error", function (error) {
+                          stream.on("error",  (error) =>{
                             console.error(
                               "Error during compilation or runtime:",
                               error
@@ -246,7 +249,7 @@ export default class Problem {
                               AttachStdout: true,
                               AttachStderr: true,
                             },
-                            function (err, exec) {
+                             (err, exec)=> {
                               if (err) {
                                 console.error("Error creating exec:", err);
                                 if (verdict == "") {
@@ -254,7 +257,7 @@ export default class Problem {
                                 }
                               }
 
-                              exec.start(function (err, stream) {
+                              exec.start((err, stream)=> {
                                 if (err) {
                                   console.error("Error starting exec:", err);
                                   if (verdict == "") {
@@ -262,11 +265,11 @@ export default class Problem {
                                   }
                                 }
 
-                                stream.on("data", function (data) {
+                                stream.on("data", (data)=> {
                                   console.log(data.toString());
                                 });
 
-                                stream.on("error", function (error) {
+                                stream.on("error", (error)=> {
                                   console.error(
                                     "Error during compilation or runtime:",
                                     error
@@ -288,7 +291,7 @@ export default class Problem {
                                 AttachStdout: true,
                                 AttachStderr: true,
                               },
-                              function (err, exec) {
+                              (err, exec)=> {
                                 if (err) {
                                   console.error("Error creating exec:", err);
                                   if (verdict == "") {
@@ -296,7 +299,7 @@ export default class Problem {
                                   }
                                 }
 
-                                exec.start(function (err, stream) {
+                                exec.start( (err, stream) =>{
                                   if (err) {
                                     console.error("Error starting exec:", err);
                                     if (verdict == "") {
@@ -305,11 +308,11 @@ export default class Problem {
                                   }
 
                                   let output = "";
-                                  stream.on("data", function (data) {
+                                  stream.on("data",  (data)=> {
                                     output += data.toString();
                                   });
 
-                                  stream.on("end", function () {
+                                  stream.on("end",  ()=> {
                                     // If the output of the diff command is empty, the files are the same
                                     if (output.trim() === "") {
                                       console.log("The files are the same");
@@ -329,7 +332,7 @@ export default class Problem {
                                           AttachStdout: true,
                                           AttachStderr: true,
                                         },
-                                        function (err, exec) {
+                                         (err, exec)=> {
                                           if (err) {
                                             console.error(
                                               "Error creating exec:",
@@ -340,7 +343,7 @@ export default class Problem {
                                             }
                                           }
 
-                                          exec.start(function (err, stream) {
+                                          exec.start( (err, stream)=> {
                                             if (err) {
                                               console.error(
                                                 "Error starting exec:",
@@ -383,7 +386,7 @@ export default class Problem {
                                           AttachStdout: true,
                                           AttachStderr: true,
                                         },
-                                        function (err, exec) {
+                                         (err, exec)=> {
                                           if (err) {
                                             console.error(
                                               "Error creating exec:",
@@ -394,7 +397,7 @@ export default class Problem {
                                             }
                                           }
 
-                                          exec.start(function (err, stream) {
+                                          exec.start((err, stream)=> {
                                             if (err) {
                                               console.error(
                                                 "Error starting exec:",
@@ -431,7 +434,7 @@ export default class Problem {
                                     }
                                   });
 
-                                  stream.on("error", function (error) {
+                                  stream.on("error", (error)=> {
                                     console.error(
                                       "Error during diff command:",
                                       error
@@ -451,7 +454,7 @@ export default class Problem {
                               process.stdout,
                               process.stderr
                             );
-                            container.stop(function (err) {
+                            container.stop((err) =>{
                               if (err) {
                                 console.error("Error stopping container:", err);
                                 if (verdict == "") {
@@ -459,7 +462,7 @@ export default class Problem {
                                 }
                               }
                               console.log("Container stopped");
-                              container.remove(function (err) {
+                              container.remove( (err)=> {
                                 if (err) {
                                   console.error(
                                     "Error removing container:",
@@ -473,7 +476,7 @@ export default class Problem {
                               });
                             });
                             console.log(verdict);
-                            await adminDB.insertOne(adminDB.solution, {
+                            await this.adminDB.insertOne(this.adminDB.solution, {
                               code: code,
                               verdict: verdict,
                               problemId: problemId,
@@ -483,8 +486,8 @@ export default class Problem {
                             });
 
                             if (verdict === "Accepted") {
-                              const data = await adminDB.findOne(
-                                adminDB.solved,
+                              const data = await this.adminDB.findOne(
+                                this.adminDB.solved,
                                 {
                                   handle: handle,
                                 },
@@ -494,8 +497,8 @@ export default class Problem {
                               );
                               console.log(data, handle);
                               if (!data.problems.includes(problemId)) {
-                                await adminDB.updateOne(
-                                  adminDB.solved,
+                                await this.adminDB.updateOne(
+                                  this.adminDB.solved,
                                   {
                                     handle: handle,
                                   },
@@ -553,7 +556,7 @@ export default class Problem {
           AttachStderr: true,
           Cmd: ["bash"],
         };
-        const problem = await adminDB.findOne(adminDB.problem, {
+        const problem = await this.adminDB.findOne(this.adminDB.problem, {
           _id: new ObjectId(problemId),
         });
 
@@ -584,13 +587,13 @@ export default class Problem {
           }
         );
         // Create and start container
-        docker.createContainer(containerOptions, function (err, container) {
+        docker.createContainer(containerOptions,  (err, container) =>{
           if (err) {
             console.error("Error creating container:", err);
             verdict = "Internal Error";
           }
 
-          container.start(function (err) {
+          container.start( (err)=> {
             if (err) {
               console.error("Error starting container:", err);
               verdict = "Internal Error";
@@ -633,7 +636,7 @@ export default class Problem {
             pack6.entry({ name: "CorrectCode.java" }, fileContents6);
             pack6.finalize();
 
-            container.putArchive(pack, { path: "/" }, function (err) {
+            container.putArchive(pack, { path: "/" },  (err)=> {
               if (err) {
                 console.error("Error copying file to container:", err);
                 verdict = "Internal Error";
@@ -643,7 +646,7 @@ export default class Problem {
               container.putArchive(
                 pack2,
                 { path: "/" },
-                function (err) {
+                 (err)=> {
                   if (err) {
                     console.error("Error copying file to container:", err);
                     verdict = "Internal Error";
@@ -654,7 +657,7 @@ export default class Problem {
                 container.putArchive(
                   pack3,
                   { path: "/" },
-                  function (err) {
+                  (err)=> {
                     if (err) {
                       console.error("Error copying file to container:", err);
                       verdict = "Internal Error";
@@ -665,7 +668,7 @@ export default class Problem {
                   container.putArchive(
                     pack4,
                     { path: "/" },
-                    function (err) {
+                    (err) =>{
                       if (err) {
                         console.error("Error copying file to container:", err);
                         verdict = "Internal Error";
@@ -692,7 +695,7 @@ export default class Problem {
                     container.putArchive(
                       pack6,
                       { path: "/" },
-                      function (err) {
+                     (err) =>{
                         if (err) {
                           console.error(
                             "Error copying file to container:",
@@ -710,26 +713,26 @@ export default class Problem {
                           AttachStdout: true,
                           AttachStderr: true,
                         },
-                        function (err, exec) {
+                         (err, exec)=> {
                           if (err) {
                             console.error("Error creating exec:", err);
                             verdict = "Internal Error";
                           }
 
-                          exec.start(function (err, stream) {
+                          exec.start( (err, stream)=> {
                             if (err) {
                               console.error("Error starting exec:", err);
                               verdict = "Internal Error";
                             }
 
-                            stream.on("data", function (data) {
+                            stream.on("data", (data)=> {
                               console.log(data.toString());
                               if (verdict == "") {
                                 verdict = "Compilation Error";
                               }
                             });
 
-                            stream.on("error", function (error) {
+                            stream.on("error",  (error)=> {
                               console.error(
                                 "Error during compilation or runtime:",
                                 error
@@ -747,7 +750,7 @@ export default class Problem {
                                 AttachStdout: true,
                                 AttachStderr: true,
                               },
-                              function (err, exec) {
+                              (err, exec)=> {
                                 if (err) {
                                   console.error("Error creating exec:", err);
                                   if (verdict == "") {
@@ -755,7 +758,7 @@ export default class Problem {
                                   }
                                 }
 
-                                exec.start(function (err, stream) {
+                                exec.start( (err, stream)=> {
                                   if (err) {
                                     console.error("Error starting exec:", err);
                                     if (verdict == "") {
@@ -763,11 +766,11 @@ export default class Problem {
                                     }
                                   }
 
-                                  stream.on("data", function (data) {
+                                  stream.on("data",  (data)=> {
                                     console.log(data.toString());
                                   });
 
-                                  stream.on("error", function (error) {
+                                  stream.on("error",(error)=> {
                                     console.error(
                                       "Error during compilation or runtime:",
                                       error
@@ -793,7 +796,7 @@ export default class Problem {
                                   AttachStdout: true,
                                   AttachStderr: true,
                                 },
-                                function (err, exec) {
+                                 (err, exec)=> {
                                   if (err) {
                                     console.error("Error creating exec:", err);
                                     if (verdict == "") {
@@ -801,7 +804,7 @@ export default class Problem {
                                     }
                                   }
 
-                                  exec.start(function (err, stream) {
+                                  exec.start( (err, stream)=> {
                                     if (err) {
                                       console.error(
                                         "Error starting exec:",
@@ -813,11 +816,11 @@ export default class Problem {
                                     }
 
                                     let output = "";
-                                    stream.on("data", function (data) {
+                                    stream.on("data", (data) =>{
                                       output += data.toString();
                                     });
 
-                                    stream.on("end", function () {
+                                    stream.on("end", ()=> {
                                       // If the output of the diff command is empty, the files are the same
                                       if (output.trim() === "") {
                                         console.log("The files are the same");
@@ -838,7 +841,7 @@ export default class Problem {
                                             AttachStdout: true,
                                             AttachStderr: true,
                                           },
-                                          function (err, exec) {
+                                           (err, exec)=> {
                                             if (err) {
                                               console.error(
                                                 "Error creating exec:",
@@ -849,7 +852,7 @@ export default class Problem {
                                               }
                                             }
 
-                                            exec.start(function (err, stream) {
+                                            exec.start( (err, stream)=> {
                                               if (err) {
                                                 console.error(
                                                   "Error starting exec:",
@@ -892,7 +895,7 @@ export default class Problem {
                                             AttachStdout: true,
                                             AttachStderr: true,
                                           },
-                                          function (err, exec) {
+                                          (err, exec)=> {
                                             if (err) {
                                               console.error(
                                                 "Error creating exec:",
@@ -903,7 +906,7 @@ export default class Problem {
                                               }
                                             }
 
-                                            exec.start(function (err, stream) {
+                                            exec.start((err, stream)=> {
                                               if (err) {
                                                 console.error(
                                                   "Error starting exec:",
@@ -940,7 +943,7 @@ export default class Problem {
                                       }
                                     });
 
-                                    stream.on("error", function (error) {
+                                    stream.on("error",  (error) =>{
                                       console.error(
                                         "Error during diff command:",
                                         error
@@ -960,7 +963,7 @@ export default class Problem {
                                 process.stdout,
                                 process.stderr
                               );
-                              container.stop(function (err) {
+                              container.stop( (err)=> {
                                 if (err) {
                                   console.error(
                                     "Error stopping container:",
@@ -971,7 +974,7 @@ export default class Problem {
                                   }
                                 }
                                 console.log("Container stopped");
-                                container.remove(function (err) {
+                                container.remove((err)=> {
                                   if (err) {
                                     console.error(
                                       "Error removing container:",
@@ -985,7 +988,7 @@ export default class Problem {
                                 });
                               });
                               console.log(verdict);
-                              await adminDB.insertOne(adminDB.solution, {
+                              await this.adminDB.insertOne(this.adminDB.solution, {
                                 code: code,
                                 verdict: verdict,
                                 problemId: problemId,
@@ -995,8 +998,8 @@ export default class Problem {
                               });
 
                               if (verdict === "Accepted") {
-                                const data = await adminDB.findOne(
-                                  adminDB.solved,
+                                const data = await this.adminDB.findOne(
+                                  this.adminDB.solved,
                                   {
                                     handle: handle,
                                   },
@@ -1006,8 +1009,8 @@ export default class Problem {
                                 );
                                 console.log(data, handle);
                                 if (!data.problems.includes(problemId)) {
-                                  await adminDB.updateOne(
-                                    adminDB.solved,
+                                  await this.adminDB.updateOne(
+                                    this.adminDB.solved,
                                     {
                                       handle: handle,
                                     },
@@ -1070,13 +1073,13 @@ export default class Problem {
       }
     }
   }; // working fine
-  static fetchSolvedProblems = async (req, res) => {
+   fetchSolvedProblems = async (req, res) => {
     // fetch the solved problems of the user from the solved collection
     let token = req.body.userToken;
     try {
-        let decoded = adminJWT.verifyToken(token);
+        let decoded = this.adminJWT.verifyToken(token);
         let handle = decoded.handle;
-        const data = await adminDB.findOne(adminDB.solved, {
+        const data = await this.adminDB.findOne(this.adminDB.solved, {
         handle: handle},{problems:1,_id:0}
         );
         res.send({ success: true, problems: data.problems,message:"Solved problems fetched successfully" });
@@ -1097,18 +1100,18 @@ export default class Problem {
         }
     }
   }; // working fine
-  static fetchAllSubmissions = async (req, res) => {
+   fetchAllSubmissions = async (req, res) => {
     // fetch all the submissions of the user from the solution collection
     let token = req.body.token;
     try {
-        let decoded = adminJWT.verifyToken(token);
+        let decoded = this.adminJWT.verifyToken(token);
         let handle = decoded.handle;
-        let data = await adminDB.find(adminDB.solution, {
+        let data = await this.adminDB.find(this.adminDB.solution, {
         handle: handle
         });
         if(data.length > 0){
             let problems = data.map(item => new ObjectId(item.problemId));
-            const problemData = await adminDB.find(adminDB.problem, {
+            const problemData = await this.adminDB.find(this.adminDB.problem, {
                 _id: { $in: problems }
             },{},{title:1});
             console.log(problemData);
@@ -1136,21 +1139,21 @@ export default class Problem {
         }
     }
   }; // working fine
-  static fetchAllProblems = async (req, res) => {
+   fetchAllProblems = async (req, res) => {
     // fetch all the problems from the problem collection
     try {
-        let data = await adminDB.find(adminDB.problem, {},{timestamp:-1},{title:1,timestamp:1});
+        let data = await this.adminDB.find(this.adminDB.problem, {},{timestamp:-1},{title:1,timestamp:1});
         res.send({ success: true, problems: data,message:"Problems fetched successfully" });
         
     } catch (error) {
         res.send({ success: false, message: error.message });
     }
   }; // working fine
-  static fetchProblemDetails = async (req, res) => {
+   fetchProblemDetails = async (req, res) => {
     // fetch the problem details from the problem collection
     let problemId = req.body.problemId;
     try {
-        let data = await adminDB.findOne(adminDB.problem, {
+        let data = await this.adminDB.findOne(this.adminDB.problem, {
         _id: new ObjectId(problemId)
         },{_id:0,correct_code_CPP:0,correct_code_JAVA:0,testcases:0});
         res.send({ success: true, problem: data,message:"Problem details fetched successfully" });
