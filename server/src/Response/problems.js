@@ -50,7 +50,7 @@ export default class Problem {
     }
   }; // working fine
    submitSolution = async (req, res) => {
-    // handle problem submission
+    // Handle problem submission.
     try {
       let problemId = req.body.problemId;
       let token = req.body.userToken;
@@ -63,7 +63,8 @@ export default class Problem {
       if (language == "C++") {
         let verdict = "";
         const docker = new Docker();
-        // Define container options
+
+        // Define container options.
         const containerOptions = {
           Image: "gcc",
           Tty: true,
@@ -72,37 +73,46 @@ export default class Problem {
           AttachStderr: true,
           Cmd: ["bash"],
         };
+
+        // Fetching problem details from docker database.
         const problem = await this.adminDB.findOne(this.adminDB.problem, {
           _id: new ObjectId(problemId),
         });
 
+        // Unique submission id.
         let uniqueId = handle + new Date().getTime();
-        console.log(problem);
+
+        // Copying the input template.
         fs.writeFile(
           `${uniqueId}-input_template.cpp`,
           problem.input_template_CPP,
           (err) => {
             if (err) throw err;
-            console.log("Data has been written to file");
+            console.log("Error while coping input template cpp.");
           }
         );
+
+        // Copying the input testcases.
         fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
           if (err) throw err;
-          console.log("Data has been written to file");
+          console.log("Error while copying input testcases.");
         });
+
+        // Copying the user code.
         fs.writeFile(`${uniqueId}-function_def.h`, code, (err) => {
           if (err) throw err;
           console.log("Data has been written to file");
         });
+
+        // Copying the correct code cpp.
         fs.writeFile(
-          `${uniqueId}-correct_code_CPP.cpp`,
-          problem.correct_code_CPP,
-          (err) => {
+          `${uniqueId}-correct_code_CPP.cpp`, problem.correct_code_CPP, (err) => {
             if (err) throw err;
-            console.log("Data has been written to file");
+            console.log("Error in copying correct code cpp.");
           }
         );
-        // Create and start container
+
+        // Create and start container.
         docker.createContainer(containerOptions,  (err, container) =>{
           if (err) {
             console.error("Error creating container:", err);
@@ -117,7 +127,7 @@ export default class Problem {
 
             console.log("Container started");
 
-            // Copy code to container
+            // Copying file the to container.
             const pack = _pack();
             const fileContents = readFileSync(`${uniqueId}-input_template.cpp`);
             pack.entry({ name: "main.cpp" }, fileContents);
@@ -133,34 +143,27 @@ export default class Problem {
             pack3.entry({ name: "funcDef.h" }, fileContents3);
             pack3.finalize();
 
-            // const pack5 = _pack(); // create a tar pack stream
-            // const fileContents5 = readFileSync('./cfuncDef.h');
-            // pack5.entry({ name: 'cfuncDef.h' }, fileContents5); // add file to the pack
-            // pack5.finalize(); // finalize the pack stream
-
             const pack6 = _pack();
-            const fileContents6 = readFileSync(
-              `${uniqueId}-correct_code_CPP.cpp`
-            );
+            const fileContents6 = readFileSync(`${uniqueId}-correct_code_CPP.cpp`);
             pack6.entry({ name: "cmain.cpp" }, fileContents6);
             pack6.finalize();
 
             container.putArchive(pack, { path: "/" },  (err)=> {
               if (err) {
-                console.error("Error copying file to container:", err);
+                console.error("Error input template to container:", err);
                 verdict = "Internal Error";
               }
-              console.log(" Cpp File copied to container");
+              console.log("Cpp File copied to container");
 
               container.putArchive(
                 pack2,
                 { path: "/" },
                  (err)=> {
                   if (err) {
-                    console.error("Error copying file to container:", err);
+                    console.error("Error in copying input testcase file to container:", err);
                     verdict = "Internal Error";
                   }
-                  console.log(" Input File copied to container");
+                  console.log("Input testcase file copied to container");
                 },
 
                 container.putArchive(
@@ -168,40 +171,24 @@ export default class Problem {
                   { path: "/" },
                    (err)=> {
                     if (err) {
-                      console.error("Error copying file to container:", err);
+                      console.error("Error copying header file to container:", err);
                       verdict = "Internal Error";
                     }
-                    console.log(" header File copied to container");
+                    console.log("Header File copied to container");
                   },
-
-                  // container.putArchive(pack4, { path: '/' }, function (err) {
-                  //   if (err) {
-                  //     console.error('Error copying file to container:', err);
-                  //     return;
-                  //   }
-                  //   console.log(' Correct output File copied to container');
-                  // },
-
-                  // container.putArchive(pack5, { path: '/' }, function (err) {
-                  //   if (err) {
-                  // 	console.error('Error copying file to container:', err);
-                  // 	return;
-                  //   }
-                  //   console.log(' Correct output File copied to container');
-                  // },
 
                   container.putArchive(
                     pack6,
                     { path: "/" },
                      (err)=> {
                       if (err) {
-                        console.error("Error copying file to container:", err);
+                        console.error("Error copying correct code to container:", err);
                         verdict = "Internal Error";
                       }
-                      console.log(" Correct output File copied to container");
+                      console.log("Correct output File copied to container.");
                     },
 
-                    // Compile and run code
+                    // Compile and run code user code.
                     container.exec(
                       {
                         Cmd: [
@@ -218,6 +205,7 @@ export default class Problem {
                           verdict = "Internal Error";
                         }
 
+                        // Start execution of user code.
                         exec.start( (err, stream)=> {
                           if (err) {
                             console.error("Error starting exec:", err);
@@ -225,20 +213,14 @@ export default class Problem {
                           }
 
                           stream.on("data",  (data)=> {
-                            console.log(data.toString());
-                            if (verdict == "") {
-                              verdict = "Compilation Error";
-                            }
+                            verdict = verdict === "" ? "Compilation Error" : verdict;
                           });
 
                           stream.on("error",  (error) =>{
-                            console.error(
-                              "Error during compilation or runtime:",
-                              error
-                            );
+                            console.error("Error during compilation or runtime of user code:",error);
                           });
 
-                          // Compile and run code
+                          // Compile and run code.
                           container.exec(
                             {
                               Cmd: [
@@ -252,39 +234,35 @@ export default class Problem {
                              (err, exec)=> {
                               if (err) {
                                 console.error("Error creating exec:", err);
-                                if (verdict == "") {
-                                  verdict = "Internal Error";
-                                }
+                                verdict = verdict === "" ? "Internal Error" : verdict;
                               }
 
+                              // Start execution correct code.
                               exec.start((err, stream)=> {
                                 if (err) {
                                   console.error("Error starting exec:", err);
-                                  if (verdict == "") {
-                                    verdict = "Internal Error";
-                                  }
+                                  verdict = verdict === "" ? "Internal Error" : verdict;
                                 }
 
                                 stream.on("data", (data)=> {
-                                  console.log(data.toString());
                                 });
 
                                 stream.on("error", (error)=> {
-                                  console.error(
-                                    "Error during compilation or runtime:",
-                                    error
+                                  console.error("Error during compilation or runtime of correct code:",error
                                   );
                                 });
                               });
                             }
                           );
 
+                          // Putting setTimeout to allow execution first then comparision of files.
                           setTimeout(() => {
-                            // Read the contents of the files into memory
+
+                            // Read the contents of the files into memory.
                             const file1 = "output.txt";
                             const file2 = "coutput.txt";
 
-                            // Run the diff command inside the container
+                            // Run the diff command inside the container.
                             container.exec(
                               {
                                 Cmd: ["diff", file1, file2],
@@ -293,18 +271,15 @@ export default class Problem {
                               },
                               (err, exec)=> {
                                 if (err) {
-                                  console.error("Error creating exec:", err);
-                                  if (verdict == "") {
-                                    verdict = "Internal Error";
-                                  }
+                                  console.error("Error creating exec of diff command:", err);
+                                  verdict = verdict === "" ? "Internal Error" : verdict;
                                 }
 
+                                // Start execution.
                                 exec.start( (err, stream) =>{
                                   if (err) {
-                                    console.error("Error starting exec:", err);
-                                    if (verdict == "") {
-                                      verdict = "Internal Error";
-                                    }
+                                    console.error("Error starting exec of diff command:", err);
+                                    verdict = verdict === "" ? "Internal Error" : verdict;
                                   }
 
                                   let output = "";
@@ -312,165 +287,48 @@ export default class Problem {
                                     output += data.toString();
                                   });
 
+                                  // On stream end.
                                   stream.on("end",  ()=> {
+
                                     // If the output of the diff command is empty, the files are the same
                                     if (output.trim() === "") {
-                                      console.log("The files are the same");
-                                      if (verdict == "") {
-                                        verdict = "Accepted";
-                                      }
+                                      console.log("Correct output generated.");
+                                      verdict = verdict === "" ? "Accepted" : verdict;
                                     } else {
                                       console.log("The files are different");
-                                      if (verdict == "") {
-                                        verdict = "Wrong Answer";
-                                      }
-
-                                      // Print the contents of the files to see the differences
-                                      container.exec(
-                                        {
-                                          Cmd: ["cat", file1],
-                                          AttachStdout: true,
-                                          AttachStderr: true,
-                                        },
-                                         (err, exec)=> {
-                                          if (err) {
-                                            console.error(
-                                              "Error creating exec:",
-                                              err
-                                            );
-                                            if (verdict == "") {
-                                              verdict = "Internal Error";
-                                            }
-                                          }
-
-                                          exec.start( (err, stream)=> {
-                                            if (err) {
-                                              console.error(
-                                                "Error starting exec:",
-                                                err
-                                              );
-                                              if (verdict == "") {
-                                                verdict = "Internal Error";
-                                              }
-                                            }
-
-                                            stream.pipe(process.stdout);
-                                            let data = "";
-                                            stream.on("data", (chunk) => {
-                                              data += chunk;
-                                            });
-
-                                            stream.on("end", () => {
-                                              console.log(data.toString());
-                                              if (
-                                                data
-                                                  .toString()
-                                                  .endsWith(
-                                                    "No such file or directory\n"
-                                                  )
-                                              ) {
-                                                if (verdict == "") {
-                                                  verdict = "TLE";
-                                                }
-                                              }
-                                            });
-                                          });
-                                        }
-                                      );
-
-                                      console.log("vs");
-
-                                      container.exec(
-                                        {
-                                          Cmd: ["cat", file2],
-                                          AttachStdout: true,
-                                          AttachStderr: true,
-                                        },
-                                         (err, exec)=> {
-                                          if (err) {
-                                            console.error(
-                                              "Error creating exec:",
-                                              err
-                                            );
-                                            if (verdict == "") {
-                                              verdict = "Internal Error";
-                                            }
-                                          }
-
-                                          exec.start((err, stream)=> {
-                                            if (err) {
-                                              console.error(
-                                                "Error starting exec:",
-                                                err
-                                              );
-                                              if (verdict == "") {
-                                                verdict = "Internal Error";
-                                              }
-                                            }
-
-                                            stream.pipe(process.stdout);
-                                            let data = "";
-                                            stream.on("data", (chunk) => {
-                                              data += chunk;
-                                            });
-
-                                            stream.on("end", () => {
-                                              console.log(data.toString());
-                                              if (
-                                                data
-                                                  .toString()
-                                                  .endsWith(
-                                                    "No such file or directory\n"
-                                                  )
-                                              ) {
-                                                if (verdict == "") {
-                                                  verdict = "Internal Error";
-                                                }
-                                              }
-                                            });
-                                          });
-                                        }
-                                      );
+                                      verdict = verdict === "" ? "Accepted" : verdict;
                                     }
+
                                   });
 
                                   stream.on("error", (error)=> {
-                                    console.error(
-                                      "Error during diff command:",
-                                      error
-                                    );
-                                    if (verdict == "") {
-                                      verdict = "Internal Error";
-                                    }
+                                    console.error("Error during diff command:",error);
+                                    verdict = verdict === "" ? "Internal Error" : verdict;
                                   });
                                 });
                               }
                             );
                           }, 4000 * problem.time_limit);
 
+                          // After verdict.
                           setTimeout(async () => {
                             container.modem.demuxStream(
                               stream,
                               process.stdout,
                               process.stderr
                             );
+
+                            // Stopping the container.
                             container.stop((err) =>{
                               if (err) {
                                 console.error("Error stopping container:", err);
-                                if (verdict == "") {
-                                  verdict = "Internal Error";
-                                }
+                                verdict = verdict === "" ? "Internal Error" : verdict;
                               }
                               console.log("Container stopped");
                               container.remove( (err)=> {
                                 if (err) {
-                                  console.error(
-                                    "Error removing container:",
-                                    err
-                                  );
-                                  if (verdict == "") {
-                                    verdict = "Internal Error";
-                                  }
+                                  console.error("Error removing container:",err);
+                                  verdict = verdict === "" ? "Internal Error" : verdict;
                                 }
                                 console.log("Container removed");
                               });
@@ -485,6 +343,7 @@ export default class Problem {
                               language: language,
                             });
 
+                            // If verdict is accepted.
                             if (verdict === "Accepted") {
                               const data = await this.adminDB.findOne(
                                 this.adminDB.solved,
@@ -511,7 +370,10 @@ export default class Problem {
                               }
                             }
 
+                            // Returning the verdict.
                             res.send({ success: true, verdict: verdict });
+
+                            // Removing files from the container.
                             fs.unlink(
                               `${uniqueId}-input_template.cpp`,
                               (err) => {
@@ -545,9 +407,11 @@ export default class Problem {
           });
         });
       } else if ((language = "Java")) {
+
         let verdict = "";
         const docker = new Docker();
-        // Define container options
+
+        // Defining container options.
         const containerOptions = {
           Image: "openjdk",
           Tty: true,
@@ -556,37 +420,44 @@ export default class Problem {
           AttachStderr: true,
           Cmd: ["bash"],
         };
+
+        // Fetching problem from database.
         const problem = await this.adminDB.findOne(this.adminDB.problem, {
           _id: new ObjectId(problemId),
         });
 
+        // Unique submission id.
         let uniqueId = handle + new Date().getTime();
-        console.log(problem);
+
+        // Copying input template to server.
         fs.writeFile(
-          `${uniqueId}-input_template.java`,
-          problem.input_template_JAVA,
-          (err) => {
+          `${uniqueId}-input_template.java`,problem.input_template_JAVA,(err) => {
             if (err) throw err;
-            console.log("Data has been written to file");
+            console.log("Error in copying input template to server.");
           }
         );
+
+        // Copying input test case file to server.
         fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
           if (err) throw err;
-          console.log("Data has been written to file");
+          console.log("Error in copying input test case to server.");
         });
+
+        // Copying user code file to server.
         fs.writeFile(`${uniqueId}-Solution.java`, code, (err) => {
           if (err) throw err;
-          console.log("Data has been written to file");
+          console.log("Error in copying user code test case to server.");
         });
+
+        // Copying correct code file to server.
         fs.writeFile(
-          `${uniqueId}-correct_code_JAVA.java`,
-          problem.correct_code_JAVA,
-          (err) => {
+          `${uniqueId}-correct_code_JAVA.java`,problem.correct_code_JAVA, (err) => {
             if (err) throw err;
-            console.log("Data has been written to file");
+            console.log("Error in copying correct code test case to server.");
           }
         );
-        // Create and start container
+
+        // Create and start container.
         docker.createContainer(containerOptions,  (err, container) =>{
           if (err) {
             console.error("Error creating container:", err);
@@ -601,11 +472,9 @@ export default class Problem {
 
             console.log("Container started");
 
-            // Copy code to container
+            // Copying all the files required from the server into the container.
             const pack = _pack();
-            const fileContents = readFileSync(
-              `${uniqueId}-input_template.java`
-            );
+            const fileContents = readFileSync(`${uniqueId}-input_template.java`);
             pack.entry({ name: "Func.java" }, fileContents);
             pack.finalize();
 
@@ -619,20 +488,14 @@ export default class Problem {
             pack3.entry({ name: "Solution.java" }, fileContents3);
             pack3.finalize();
 
+            // CompareFiles to compare output generated by user and admin.
             const pack4 = _pack();
             const fileContents4 = readFileSync("CompareFiles.java");
             pack4.entry({ name: "CompareFiles.java" }, fileContents4);
             pack4.finalize();
 
-            // const pack5 = _pack(); // create a tar pack stream
-            // const fileContents5 = readFileSync('./cfuncDef.h');
-            // pack5.entry({ name: 'cfuncDef.h' }, fileContents5); // add file to the pack
-            // pack5.finalize(); // finalize the pack stream
-
             const pack6 = _pack();
-            const fileContents6 = readFileSync(
-              `${uniqueId}-correct_code_JAVA.java`
-            );
+            const fileContents6 = readFileSync(`${uniqueId}-correct_code_JAVA.java`);
             pack6.entry({ name: "CorrectCode.java" }, fileContents6);
             pack6.finalize();
 
@@ -641,72 +504,41 @@ export default class Problem {
                 console.error("Error copying file to container:", err);
                 verdict = "Internal Error";
               }
-              console.log(" Cpp File copied to container");
+              console.log("Error copying input template to container.");
 
-              container.putArchive(
-                pack2,
-                { path: "/" },
-                 (err)=> {
+              container.putArchive( pack2, { path: "/" }, (err)=> {
                   if (err) {
-                    console.error("Error copying file to container:", err);
+                    console.error("Error copying input test case to container:", err);
                     verdict = "Internal Error";
                   }
-                  console.log(" Input File copied to container");
+                  console.log("Error copying input test case to container.");
                 },
 
-                container.putArchive(
-                  pack3,
-                  { path: "/" },
-                  (err)=> {
+                container.putArchive( pack3, { path: "/" }, (err)=> {
                     if (err) {
-                      console.error("Error copying file to container:", err);
+                      console.error("Error copying solution java file to container:", err);
                       verdict = "Internal Error";
                     }
-                    console.log(" header File copied to container");
+                    console.log("Error copying solution java file to container.");
                   },
 
-                  container.putArchive(
-                    pack4,
-                    { path: "/" },
-                    (err) =>{
+                  container.putArchive(pack4, { path: "/" }, (err) =>{
                       if (err) {
-                        console.error("Error copying file to container:", err);
+                        console.error("Error copying solution to container:", err);
                         verdict = "Internal Error";
                       }
-                      console.log(" header File copied to container");
+                      console.log("Error comparing compareFiles to container.");
                     },
 
-                    // container.putArchive(pack4, { path: '/' }, function (err) {
-                    //   if (err) {
-                    //     console.error('Error copying file to container:', err);
-                    //     return;
-                    //   }
-                    //   console.log(' Correct output File copied to container');
-                    // },
-
-                    // container.putArchive(pack5, { path: '/' }, function (err) {
-                    //   if (err) {
-                    // 	console.error('Error copying file to container:', err);
-                    // 	return;
-                    //   }
-                    //   console.log(' Correct output File copied to container');
-                    // },
-
-                    container.putArchive(
-                      pack6,
-                      { path: "/" },
-                     (err) =>{
+                    container.putArchive( pack6, { path: "/" },(err) =>{
                         if (err) {
-                          console.error(
-                            "Error copying file to container:",
-                            err
-                          );
+                          console.error("Error copying correct code to container:",err);
                           verdict = "Internal Error";
                         }
-                        console.log(" Correct output File copied to container");
+                        console.log("Error copying correct code to container:");
                       },
 
-                      // Compile and run code
+                      // Compile and run user java code.
                       container.exec(
                         {
                           Cmd: ["sh", "-c", "javac *.java && java Func"],
@@ -719,6 +551,7 @@ export default class Problem {
                             verdict = "Internal Error";
                           }
 
+                          // Start execution.
                           exec.start( (err, stream)=> {
                             if (err) {
                               console.error("Error starting exec:", err);
@@ -727,19 +560,14 @@ export default class Problem {
 
                             stream.on("data", (data)=> {
                               console.log(data.toString());
-                              if (verdict == "") {
-                                verdict = "Compilation Error";
-                              }
+                              verdict = verdict === "" ? "Compilation Error" : verdict;
                             });
 
                             stream.on("error",  (error)=> {
-                              console.error(
-                                "Error during compilation or runtime:",
-                                error
-                              );
+                              console.error("Error during compilation or runtime:",error);
                             });
 
-                            // Compile and run code
+                            // Compile and run correct java code.
                             container.exec(
                               {
                                 Cmd: [
@@ -753,39 +581,35 @@ export default class Problem {
                               (err, exec)=> {
                                 if (err) {
                                   console.error("Error creating exec:", err);
-                                  if (verdict == "") {
-                                    verdict = "Internal Error";
-                                  }
+                                  verdict = verdict === "" ? "Internal Error" : verdict;
                                 }
 
+                                // Start execution of correct code.
                                 exec.start( (err, stream)=> {
                                   if (err) {
                                     console.error("Error starting exec:", err);
-                                    if (verdict == "") {
-                                      verdict = "Internal Error";
-                                    }
+                                    verdict = verdict === "" ? "Internal Error" : verdict;
                                   }
 
                                   stream.on("data",  (data)=> {
                                     console.log(data.toString());
                                   });
 
+                                  // Runtime or compilation error while running.
                                   stream.on("error",(error)=> {
-                                    console.error(
-                                      "Error during compilation or runtime:",
-                                      error
-                                    );
+                                    console.error("Error during compilation or runtime:",error);
                                   });
                                 });
                               }
                             );
 
                             setTimeout(() => {
+
                               // Read the contents of the files into memory
                               const file1 = "output.txt";
                               const file2 = "coutput.txt";
 
-                              // Run the diff command inside the container
+                              // Run the compareFiles inside the container.
                               container.exec(
                                 {
                                   Cmd: [
@@ -799,20 +623,13 @@ export default class Problem {
                                  (err, exec)=> {
                                   if (err) {
                                     console.error("Error creating exec:", err);
-                                    if (verdict == "") {
-                                      verdict = "Internal Error";
-                                    }
+                                    verdict = verdict === "" ? "Internal Error" : verdict;
                                   }
 
+                                  // Start execution of compareFiles.
                                   exec.start( (err, stream)=> {
-                                    if (err) {
-                                      console.error(
-                                        "Error starting exec:",
-                                        err
-                                      );
-                                      if (verdict == "") {
-                                        verdict = "Internal Error";
-                                      }
+                                    if (err) { console.error( "Error starting exec:", err);
+                                      verdict = verdict === "" ? "Internal Error" : verdict;
                                     }
 
                                     let output = "";
@@ -821,136 +638,21 @@ export default class Problem {
                                     });
 
                                     stream.on("end", ()=> {
-                                      // If the output of the diff command is empty, the files are the same
+
+                                      // If the output of the compare file is empty, the files are the same.
                                       if (output.trim() === "") {
-                                        console.log("The files are the same");
-                                        if (verdict == "") {
-                                          verdict = "Accepted";
-                                        }
+                                        console.log("Both output files are the same.");
+                                        verdict = verdict === "" ? "Accepted" : verdict;
                                       } else {
-                                        console.log("The files are different");
-                                        console.log(output);
-                                        if (verdict == "") {
-                                          verdict = "Wrong Answer";
-                                        }
-
-                                        // Print the contents of the files to see the differences
-                                        container.exec(
-                                          {
-                                            Cmd: ["cat", file1],
-                                            AttachStdout: true,
-                                            AttachStderr: true,
-                                          },
-                                           (err, exec)=> {
-                                            if (err) {
-                                              console.error(
-                                                "Error creating exec:",
-                                                err
-                                              );
-                                              if (verdict == "") {
-                                                verdict = "Internal Error";
-                                              }
-                                            }
-
-                                            exec.start( (err, stream)=> {
-                                              if (err) {
-                                                console.error(
-                                                  "Error starting exec:",
-                                                  err
-                                                );
-                                                if (verdict == "") {
-                                                  verdict = "Internal Error";
-                                                }
-                                              }
-
-                                              stream.pipe(process.stdout);
-                                              let data = "";
-                                              stream.on("data", (chunk) => {
-                                                data += chunk;
-                                              });
-
-                                              stream.on("end", () => {
-                                                console.log(data.toString());
-                                                if (
-                                                  data
-                                                    .toString()
-                                                    .endsWith(
-                                                      "No such file or directory\n"
-                                                    )
-                                                ) {
-                                                  if (verdict == "") {
-                                                    verdict = "TLE";
-                                                  }
-                                                }
-                                              });
-                                            });
-                                          }
-                                        );
-
-                                        console.log("vs");
-
-                                        container.exec(
-                                          {
-                                            Cmd: ["cat", file2],
-                                            AttachStdout: true,
-                                            AttachStderr: true,
-                                          },
-                                          (err, exec)=> {
-                                            if (err) {
-                                              console.error(
-                                                "Error creating exec:",
-                                                err
-                                              );
-                                              if (verdict == "") {
-                                                verdict = "Internal Error";
-                                              }
-                                            }
-
-                                            exec.start((err, stream)=> {
-                                              if (err) {
-                                                console.error(
-                                                  "Error starting exec:",
-                                                  err
-                                                );
-                                                if (verdict == "") {
-                                                  verdict = "Internal Error";
-                                                }
-                                              }
-
-                                              stream.pipe(process.stdout);
-                                              let data = "";
-                                              stream.on("data", (chunk) => {
-                                                data += chunk;
-                                              });
-
-                                              stream.on("end", () => {
-                                                console.log(data.toString());
-                                                if (
-                                                  data
-                                                    .toString()
-                                                    .endsWith(
-                                                      "No such file or directory\n"
-                                                    )
-                                                ) {
-                                                  if (verdict == "") {
-                                                    verdict = "Internal Error";
-                                                  }
-                                                }
-                                              });
-                                            });
-                                          }
-                                        );
+                                        console.log("Output files are the same.");
+                                        verdict = verdict === "" ? "Wrong Answer" : verdict;  
                                       }
                                     });
 
+                                    // Error occured while exceuting  compareFiles.
                                     stream.on("error",  (error) =>{
-                                      console.error(
-                                        "Error during diff command:",
-                                        error
-                                      );
-                                      if (verdict == "") {
-                                        verdict = "Internal Error";
-                                      }
+                                      console.error("Error during diff command:", error);
+                                      verdict = verdict === "" ? "Internal Error" : verdict; 
                                     });
                                   });
                                 }
@@ -963,31 +665,29 @@ export default class Problem {
                                 process.stdout,
                                 process.stderr
                               );
+
+                              // Stopping the container.
                               container.stop( (err)=> {
                                 if (err) {
-                                  console.error(
-                                    "Error stopping container:",
-                                    err
-                                  );
-                                  if (verdict == "") {
-                                    verdict = "Internal Error";
-                                  }
+                                  console.error("Error stopping container:",err);
+                                  verdict = verdict === "" ? "Internal Error" : verdict; 
                                 }
                                 console.log("Container stopped");
+
+                                // Removing the container.
                                 container.remove((err)=> {
                                   if (err) {
-                                    console.error(
-                                      "Error removing container:",
-                                      err
-                                    );
-                                    if (verdict == "") {
-                                      verdict = "Internal Error";
-                                    }
+                                    console.error("Error removing container:",err);
+                                    verdict = verdict === "" ? "Internal Error" : verdict; 
                                   }
                                   console.log("Container removed");
                                 });
                               });
+
+                              // Printing the verdict.
                               console.log(verdict);
+
+                              // Saving the submission to the database.
                               await this.adminDB.insertOne(this.adminDB.solution, {
                                 code: code,
                                 verdict: verdict,
@@ -1022,7 +722,11 @@ export default class Problem {
                                   );
                                 }
                               }
+
+                              // Returing the response.
                               res.send({ success: true, verdict: verdict });
+
+                              // Removing the files from the server.
                               fs.unlink(
                                 `${uniqueId}-input_template.java`,
                                 (err) => {
@@ -1059,14 +763,16 @@ export default class Problem {
       }
     } catch (error) {
       if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
+
+        // Handle the token expired error here.
         console.log("Token has expired");
         res.send({ success: false, message: "Token has expired." });
       } else if (error instanceof JsonWebTokenError) {
-        // handle other errors here
+
+        // Handle other errors here.
         res.send({
           success: false,
-          message: "User has logged out.Kindly login again",
+          message: "User has logged out.Kindly login again.",
         });
       } else {
         res.send({ success: false, message: error.message });
