@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { url } from '../components/Request';
+import { url } from '../components_shared/Request';
 import { setUserToken, setRoleToken } from './Token';
 
 const loginTemplate = {
