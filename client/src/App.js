@@ -8,6 +8,10 @@ import MainPage from './components_student/MainPage';
 import Profile from './components_shared/profile/Profile';
 import ViewProblems from './components_problem/problemPage/ViewProblems';
 import ViewAProblem from '../src/components_problem/problemPage/ViewAProblem';
+import AddProblem from './components_admin/addContent/problems/AddProblem';
+import AddEditorial from './components_admin/addContent/editorial/AddEditorial';
+import ViewEditorials from './components_blog/ViewEditorials';
+
 
 
 function App() {
@@ -42,6 +46,7 @@ function App() {
         <Route path='/admin' element={
           <>
             <NavBar />
+            {/* <ViewA/> */}
           </>
         } />
 
