@@ -34,12 +34,12 @@ export default function ErrorPage() {
                             </div>
                         </div>
                         <div>
-                            <img src={notfound} />
+                            <img src={notfound} alt=" "/>
                         </div>
                     </div>
                 </div>
                 <div>
-                    <img src={img} />
+                    <img src={img} alt=" "/>
                 </div>
             </div>
         </>
