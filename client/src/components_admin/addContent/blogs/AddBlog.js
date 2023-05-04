@@ -53,7 +53,6 @@ function AddBlog() {
         });
         const data = await response.json();
         return data;
-        console.log(response);
         // return (response.status === 200)
     }
 

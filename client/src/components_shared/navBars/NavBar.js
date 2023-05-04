@@ -5,7 +5,6 @@ import { getRoleToken, removeRoleToken, removeUserToken } from '../../components
 const publicRoutes = [
     { name: "Home", link: "/" },
     { name: "User Guide", link: "/" },
-    { name: "Team", link: "/meetTheTeam" },
     { name: "Sign In", link: "/signin" },
     { name: "Sign Up", link: "/signup" },
 ]

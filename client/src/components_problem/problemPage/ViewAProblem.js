@@ -1,25 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import AceEditor from 'react-ace';
 
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { url } from '../../components_shared/Request';
+
+
+
+import AceEditor from "react-ace";
+import "ace-builds/webpack-resolver";
 import 'ace-builds/src-noconflict/mode-c_cpp';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/ext-error_marker';
-import { useParams } from 'react-router-dom';
-import { url } from '../../components_shared/Request';
+import SpecficProblemSkeleton from '../../components_skeleton/SpecficProblemSkeleton';
+
 
 
 const ViewAProblem = () => {
 
     let problemToken = useParams();
 
-    
+
     const [problemData, setProblemData] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [selectedLang, setSelectedLang] = useState("cpp");
     const [code, setCodeChange] = useState("")
     const [value, setValue] = useState("// Code goes here");
-    
+
     const handleLanguageChange = (event) => {
         setSelectedLang(event.target.value);
         console.log("changed")
@@ -71,7 +78,7 @@ const ViewAProblem = () => {
             {
                 isLoading
                     ?
-                    <> </>
+                    <SpecficProblemSkeleton />
                     :
                     <div className="grid grid-cols-2 h-screen">
                         <div className="bg-gray-200">
