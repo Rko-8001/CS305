@@ -33,7 +33,6 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
             res.send({success:false,message:"Blog posting failed."})
           }
         }
@@ -69,7 +68,6 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
             res.send({success:false,message:"Comment cannot be posted due to internal error."})
           } 
         }
@@ -103,7 +101,6 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
             res.send({success:false,message:"Editorial posting failed."})
           }
         }
@@ -120,7 +117,6 @@ export default class Blog{
               res.send({ success: false,message:"Either editorial has not been made yet or the problemId is invalid." });
             }
         } catch (error) {
-            console.log(error);
             res.send({ success: false,message:"Editorial could not be sent due to some internal error." });
         }
       }; // working fine

@@ -8,11 +8,11 @@ import { pack as _pack } from "tar-stream";
 import fs from "fs";
 
 export default class Problem {
-  constructor(adminDB,adminJWT){
+  constructor(adminDB, adminJWT) {
     this.adminDB = adminDB;
     this.adminJWT = adminJWT;
   }
-   postProblem = async (req, res) => {
+  postProblem = async (req, res) => {
     // handle problem posting
     try {
       let token = req.body.userToken;
@@ -49,7 +49,7 @@ export default class Problem {
       }
     }
   }; // working fine
-   submitSolution = async (req, res) => {
+  submitSolution = async (req, res)=> {
     // Handle problem submission.
     try {
       let problemId = req.body.problemId;
@@ -60,257 +60,469 @@ export default class Problem {
       let timestamp = req.body.timestamp;
       let language = req.body.language;
 
-      if (language == "C++") {
-        let verdict = "";
-        const docker = new Docker();
-
-        // Define container options.
-        const containerOptions = {
-          Image: "gcc",
-          Tty: true,
-          AttachStdin: true,
-          AttachStdout: true,
-          AttachStderr: true,
-          Cmd: ["bash"],
-        };
-
-        // Fetching problem details from docker database.
-        const problem = await this.adminDB.findOne(this.adminDB.problem, {
+      if (language == "C++") await this.handleCPP(problemId, handle, code, timestamp, language, res); 
+      else if ((language = "Java")) await this.handleJAVA(problemId, handle, code, timestamp, language, res);
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // Handle the token expired error here.
+        console.log("Token has expired");
+        res.send({ success: false, message: "Token has expired." });
+      } else if (error instanceof JsonWebTokenError) {
+        // Handle other errors here.
+        res.send({
+          success: false,
+          message: "User has logged out.Kindly login again.",
+        });
+      } else {
+        console.log(error);
+        res.send({ success: false, message: error});
+      }
+    }
+  } // working fine
+  fetchSolvedProblems = async (req, res) => {
+    // fetch the solved problems of the user from the solved collection
+    let token = req.body.userToken;
+    try {
+      let decoded = this.adminJWT.verifyToken(token);
+      let handle = decoded.handle;
+      const data = await this.adminDB.findOne(
+        this.adminDB.solved,
+        {
+          handle: handle,
+        },
+        { problems: 1, _id: 0 }
+      );
+      res.send({
+        success: true,
+        problems: data.problems,
+        message: "Solved problems fetched successfully",
+      });
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        console.log("Token has expired");
+        res.send({ success: false, message: "Token has expired." });
+      } else if (error instanceof JsonWebTokenError) {
+        // handle other errors here
+        res.send({
+          success: false,
+          message: "User has logged out.Kindly login again",
+        });
+      } else {
+        res.send({ success: false, message: error.message });
+      }
+    }
+  }; // working fine
+  fetchAllSubmissions = async (req, res) => {
+    // fetch all the submissions of the user from the solution collection
+    let token = req.body.token;
+    try {
+      let decoded = this.adminJWT.verifyToken(token);
+      let handle = decoded.handle;
+      let data = await this.adminDB.find(this.adminDB.solution, {
+        handle: handle,
+      });
+      if (data.length > 0) {
+        let problems = data.map((item) => new ObjectId(item.problemId));
+        const problemData = await this.adminDB.find(
+          this.adminDB.problem,
+          {
+            _id: { $in: problems },
+          },
+          {},
+          { title: 1 }
+        );
+        console.log(problemData);
+        data = data.map((item) => {
+          let problem = problemData.find(
+            (problem) => problem._id.toString() === item.problemId.toString()
+          );
+          return {
+            ...item,
+            title: problem.title,
+          };
+        });
+      }
+      res.send({
+        success: true,
+        submissions: data,
+        message: "Submissions fetched successfully",
+      });
+    } catch (error) {
+      if (error instanceof TokenExpiredError) {
+        // handle the token expired error here
+        res.send({ success: false, message: "Token has expired." });
+      } else if (error instanceof JsonWebTokenError) {
+        // handle other errors here
+        res.send({
+          success: false,
+          message: "User has logged out.Kindly login again",
+        });
+      } else {
+        res.send({ success: false, message: error.message });
+      }
+    }
+  }; // working fine
+  fetchAllProblems = async (req, res) => {
+    // fetch all the problems from the problem collection
+    try {
+      let data = await this.adminDB.find(
+        this.adminDB.problem,
+        {},
+        { timestamp: -1 },
+        { title: 1, timestamp: 1 }
+      );
+      res.send({
+        success: true,
+        problems: data,
+        message: "Problems fetched successfully",
+      });
+    } catch (error) {
+      res.send({ success: false, message: error.message });
+    }
+  }; // working fine
+  fetchProblemDetails = async (req, res) => {
+    // fetch the problem details from the problem collection
+    let problemId = req.body.problemId;
+    try {
+      let data = await this.adminDB.findOne(
+        this.adminDB.problem,
+        {
           _id: new ObjectId(problemId),
-        });
+        },
+        { _id: 0, correct_code_CPP: 0, correct_code_JAVA: 0, testcases: 0 }
+      );
+      res.send({
+        success: true,
+        problem: data,
+        message: "Problem details fetched successfully",
+      });
+    } catch (error) {
+      res.send({ success: false, message: error.message });
+    }
+  }; // working fine
 
-        // Unique submission id.
-        let uniqueId = handle + new Date().getTime();
 
-        // Copying the input template.
-        fs.writeFile(
-          `${uniqueId}-input_template.cpp`,
-          problem.input_template_CPP,
-          (err) => {
-            if (err) throw err;
-            console.log("Error while coping input template cpp.");
-          }
-        );
+   handleJAVA = async (problemId, handle, code, timestamp, language, res)=> {
+    {
+      let verdict = "";
+      const docker = new Docker();
 
-        // Copying the input testcases.
-        fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
-          if (err) throw err;
-          console.log("Error while copying input testcases.");
-        });
+      // Defining container options.
+      const containerOptions = {
+        Image: "openjdk",
+        Tty: true,
+        AttachStdin: true,
+        AttachStdout: true,
+        AttachStderr: true,
+        Cmd: ["bash"],
+      };
 
-        // Copying the user code.
-        fs.writeFile(`${uniqueId}-function_def.h`, code, (err) => {
-          if (err) throw err;
-          console.log("Data has been written to file");
-        });
+      // Fetching problem from database.
+      const problem = await this.adminDB.findOne(this.adminDB.problem, {
+        _id: new ObjectId(problemId),
+      });
 
-        // Copying the correct code cpp.
-        fs.writeFile(
-          `${uniqueId}-correct_code_CPP.cpp`, problem.correct_code_CPP, (err) => {
-            if (err) throw err;
-            console.log("Error in copying correct code cpp.");
-          }
-        );
+      // Unique submission id.
+      let uniqueId = handle + new Date().getTime();
 
-        // Create and start container.
-        docker.createContainer(containerOptions,  (err, container) =>{
+      // Copying input template to server.
+      fs.writeFile(
+        `${uniqueId}-input_template.java`,
+        problem.input_template_JAVA,
+        (err) => {
+          if (err)
+            throw err;
+        }
+      );
+
+      // Copying input test case file to server.
+      fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
+        if (err)
+          throw err;
+      });
+
+      // Copying user code file to server.
+      fs.writeFile(`${uniqueId}-Solution.java`, code, (err) => {
+        if (err)
+          throw err;
+      });
+
+      // Copying correct code file to server.
+      fs.writeFile(
+        `${uniqueId}-correct_code_JAVA.java`,
+        problem.correct_code_JAVA,
+        (err) => {
+          if (err)
+            throw err;
+        }
+      );
+
+      // Create and start container.
+      docker.createContainer(containerOptions, (err, container) => {
+        if (err) {
+          console.error("Error creating container:", err);
+          verdict = "Internal Error";
+        }
+
+        container.start((err) => {
           if (err) {
-            console.error("Error creating container:", err);
+            console.error("Error starting container:", err);
             verdict = "Internal Error";
           }
 
-          container.start( (err)=> {
+          console.log("Container started");
+
+          // Copying all the files required from the server into the container.
+          const pack = _pack();
+          const fileContents = readFileSync(
+            `${uniqueId}-input_template.java`
+          );
+          pack.entry({ name: "Func.java" }, fileContents);
+          pack.finalize();
+
+          const pack2 = _pack();
+          const fileContents2 = readFileSync(`${uniqueId}-input.txt`);
+          pack2.entry({ name: "input.txt" }, fileContents2);
+          pack2.finalize();
+
+          const pack3 = _pack();
+          const fileContents3 = readFileSync(`${uniqueId}-Solution.java`);
+          pack3.entry({ name: "Solution.java" }, fileContents3);
+          pack3.finalize();
+
+          // CompareFiles to compare output generated by user and admin.
+          const pack4 = _pack();
+          const fileContents4 = readFileSync("CompareFiles.java");
+          pack4.entry({ name: "CompareFiles.java" }, fileContents4);
+          pack4.finalize();
+
+          const pack6 = _pack();
+          const fileContents6 = readFileSync(
+            `${uniqueId}-correct_code_JAVA.java`
+          );
+          pack6.entry({ name: "CorrectCode.java" }, fileContents6);
+          pack6.finalize();
+
+          container.putArchive(pack, { path: "/" }, (err) => {
             if (err) {
-              console.error("Error starting container:", err);
+              console.error("Error copying file to container:", err);
               verdict = "Internal Error";
             }
+            console.log("Error copying input template to container.");
 
-            console.log("Container started");
-
-            // Copying file the to container.
-            const pack = _pack();
-            const fileContents = readFileSync(`${uniqueId}-input_template.cpp`);
-            pack.entry({ name: "main.cpp" }, fileContents);
-            pack.finalize();
-
-            const pack2 = _pack();
-            const fileContents2 = readFileSync(`${uniqueId}-input.txt`);
-            pack2.entry({ name: "input.txt" }, fileContents2);
-            pack2.finalize();
-
-            const pack3 = _pack();
-            const fileContents3 = readFileSync(`${uniqueId}-function_def.h`);
-            pack3.entry({ name: "funcDef.h" }, fileContents3);
-            pack3.finalize();
-
-            const pack6 = _pack();
-            const fileContents6 = readFileSync(`${uniqueId}-correct_code_CPP.cpp`);
-            pack6.entry({ name: "cmain.cpp" }, fileContents6);
-            pack6.finalize();
-
-            container.putArchive(pack, { path: "/" },  (err)=> {
-              if (err) {
-                console.error("Error input template to container:", err);
-                verdict = "Internal Error";
-              }
-              console.log("Cpp File copied to container");
+            container.putArchive(
+              pack2,
+              { path: "/" },
+              (err) => {
+                if (err) {
+                  console.error(
+                    "Error copying input test case to container:",
+                    err
+                  );
+                  verdict = "Internal Error";
+                }
+                console.log("Error copying input test case to container.");
+              },
 
               container.putArchive(
-                pack2,
+                pack3,
                 { path: "/" },
-                 (err)=> {
+                (err) => {
                   if (err) {
-                    console.error("Error in copying input testcase file to container:", err);
+                    console.error(
+                      "Error copying solution java file to container:",
+                      err
+                    );
                     verdict = "Internal Error";
                   }
-                  console.log("Input testcase file copied to container");
+                  console.log(
+                    "Error copying solution java file to container."
+                  );
                 },
 
                 container.putArchive(
-                  pack3,
+                  pack4,
                   { path: "/" },
-                   (err)=> {
+                  (err) => {
                     if (err) {
-                      console.error("Error copying header file to container:", err);
+                      console.error(
+                        "Error copying solution to container:",
+                        err
+                      );
                       verdict = "Internal Error";
                     }
-                    console.log("Header File copied to container");
+                    console.log("Error comparing compareFiles to container.");
                   },
 
                   container.putArchive(
                     pack6,
                     { path: "/" },
-                     (err)=> {
+                    (err) => {
                       if (err) {
-                        console.error("Error copying correct code to container:", err);
+                        console.error(
+                          "Error copying correct code to container:",
+                          err
+                        );
                         verdict = "Internal Error";
                       }
-                      console.log("Correct output File copied to container.");
+                      console.log("Error copying correct code to container:");
                     },
 
-                    // Compile and run code user code.
+                    // Compile and run user java code.
                     container.exec(
                       {
-                        Cmd: [
-                          "sh",
-                          "-c",
-                          "gcc main.cpp -o main -lstdc++ && ./main",
-                        ],
+                        Cmd: ["sh", "-c", "javac *.java && java Func"],
                         AttachStdout: true,
                         AttachStderr: true,
                       },
-                       (err, exec) =>{
+                      (err, exec) => {
                         if (err) {
                           console.error("Error creating exec:", err);
                           verdict = "Internal Error";
                         }
 
-                        // Start execution of user code.
-                        exec.start( (err, stream)=> {
+                        // Start execution.
+                        exec.start((err, stream) => {
                           if (err) {
                             console.error("Error starting exec:", err);
                             verdict = "Internal Error";
                           }
 
-                          stream.on("data",  (data)=> {
-                            verdict = verdict === "" ? "Compilation Error" : verdict;
+                          stream.on("data", (data) => {
+                            console.log(data.toString());
+                            verdict =
+                              verdict === "" ? "Compilation Error" : verdict;
                           });
 
-                          stream.on("error",  (error) =>{
-                            console.error("Error during compilation or runtime of user code:",error);
+                          stream.on("error", (error) => {
+                            console.error(
+                              "Error during compilation or runtime:",
+                              error
+                            );
                           });
 
-                          // Compile and run code.
+                          // Compile and run correct java code.
                           container.exec(
                             {
                               Cmd: [
                                 "sh",
                                 "-c",
-                                "gcc cmain.cpp -o cmain -lstdc++ && ./cmain",
+                                "javac *.java && java CorrectCode",
                               ],
                               AttachStdout: true,
                               AttachStderr: true,
                             },
-                             (err, exec)=> {
+                            (err, exec) => {
                               if (err) {
                                 console.error("Error creating exec:", err);
-                                verdict = verdict === "" ? "Internal Error" : verdict;
+                                verdict =
+                                  verdict === "" ? "Internal Error" : verdict;
                               }
 
-                              // Start execution correct code.
-                              exec.start((err, stream)=> {
+                              // Start execution of correct code.
+                              exec.start((err, stream) => {
                                 if (err) {
                                   console.error("Error starting exec:", err);
-                                  verdict = verdict === "" ? "Internal Error" : verdict;
+                                  verdict =
+                                    verdict === ""
+                                      ? "Internal Error"
+                                      : verdict;
                                 }
 
-                                stream.on("data", (data)=> {
+                                stream.on("data", (data) => {
+                                  console.log(data.toString());
                                 });
 
-                                stream.on("error", (error)=> {
-                                  console.error("Error during compilation or runtime of correct code:",error
+                                // Runtime or compilation error while running.
+                                stream.on("error", (error) => {
+                                  console.error(
+                                    "Error during compilation or runtime:",
+                                    error
                                   );
                                 });
                               });
                             }
                           );
 
-                          // Putting setTimeout to allow execution first then comparision of files.
                           setTimeout(() => {
-
-                            // Read the contents of the files into memory.
+                            // Read the contents of the files into memory
                             const file1 = "output.txt";
                             const file2 = "coutput.txt";
 
-                            // Run the diff command inside the container.
+                            // Run the compareFiles inside the container.
                             container.exec(
                               {
-                                Cmd: ["diff", file1, file2],
+                                Cmd: [
+                                  "sh",
+                                  "-c",
+                                  "javac *.java && java CompareFiles",
+                                ],
                                 AttachStdout: true,
                                 AttachStderr: true,
                               },
-                              (err, exec)=> {
+                              (err, exec) => {
                                 if (err) {
-                                  console.error("Error creating exec of diff command:", err);
-                                  verdict = verdict === "" ? "Internal Error" : verdict;
+                                  console.error("Error creating exec:", err);
+                                  verdict =
+                                    verdict === ""
+                                      ? "Internal Error"
+                                      : verdict;
                                 }
 
-                                // Start execution.
-                                exec.start( (err, stream) =>{
+                                // Start execution of compareFiles.
+                                exec.start((err, stream) => {
                                   if (err) {
-                                    console.error("Error starting exec of diff command:", err);
-                                    verdict = verdict === "" ? "Internal Error" : verdict;
+                                    console.error(
+                                      "Error starting exec:",
+                                      err
+                                    );
+                                    verdict =
+                                      verdict === ""
+                                        ? "Internal Error"
+                                        : verdict;
                                   }
 
                                   let output = "";
-                                  stream.on("data",  (data)=> {
+                                  stream.on("data", (data) => {
                                     output += data.toString();
                                   });
 
-                                  // On stream end.
-                                  stream.on("end",  ()=> {
-
-                                    // If the output of the diff command is empty, the files are the same
+                                  stream.on("end", () => {
+                                    // If the output of the compare file is empty, the files are the same.
                                     if (output.trim() === "") {
-                                      console.log("Correct output generated.");
-                                      verdict = verdict === "" ? "Accepted" : verdict;
+                                      console.log(
+                                        "Both output files are the same."
+                                      );
+                                      verdict =
+                                        verdict === "" ? "Accepted" : verdict;
                                     } else {
-                                      console.log("The files are different");
-                                      verdict = verdict === "" ? "Accepted" : verdict;
+                                      console.log(
+                                        "Output files are the same."
+                                      );
+                                      verdict =
+                                        verdict === ""
+                                          ? "Wrong Answer"
+                                          : verdict;
                                     }
-
                                   });
 
-                                  stream.on("error", (error)=> {
-                                    console.error("Error during diff command:",error);
-                                    verdict = verdict === "" ? "Internal Error" : verdict;
+                                  // Error occured while exceuting  compareFiles.
+                                  stream.on("error", (error) => {
+                                    console.error(
+                                      "Error during diff command:",
+                                      error
+                                    );
+                                    verdict =
+                                      verdict === ""
+                                        ? "Internal Error"
+                                        : verdict;
                                   });
                                 });
                               }
                             );
                           }, 4000 * problem.time_limit);
 
-                          // After verdict.
                           setTimeout(async () => {
                             container.modem.demuxStream(
                               stream,
@@ -319,31 +531,49 @@ export default class Problem {
                             );
 
                             // Stopping the container.
-                            container.stop((err) =>{
+                            container.stop((err) => {
                               if (err) {
-                                console.error("Error stopping container:", err);
-                                verdict = verdict === "" ? "Internal Error" : verdict;
+                                console.error(
+                                  "Error stopping container:",
+                                  err
+                                );
+                                verdict =
+                                  verdict === "" ? "Internal Error" : verdict;
                               }
                               console.log("Container stopped");
-                              container.remove( (err)=> {
+
+                              // Removing the container.
+                              container.remove((err) => {
                                 if (err) {
-                                  console.error("Error removing container:",err);
-                                  verdict = verdict === "" ? "Internal Error" : verdict;
+                                  console.error(
+                                    "Error removing container:",
+                                    err
+                                  );
+                                  verdict =
+                                    verdict === ""
+                                      ? "Internal Error"
+                                      : verdict;
                                 }
                                 console.log("Container removed");
                               });
                             });
-                            console.log(verdict);
-                            await this.adminDB.insertOne(this.adminDB.solution, {
-                              code: code,
-                              verdict: verdict,
-                              problemId: problemId,
-                              handle: handle,
-                              timestamp: new Date(timestamp),
-                              language: language,
-                            });
 
-                            // If verdict is accepted.
+                            // Printing the verdict.
+                            console.log(verdict);
+
+                            // Saving the submission to the database.
+                            await this.adminDB.insertOne(
+                              this.adminDB.solution,
+                              {
+                                code: code,
+                                verdict: verdict,
+                                problemId: problemId,
+                                handle: handle,
+                                timestamp: new Date(timestamp),
+                                language: language,
+                              }
+                            );
+
                             if (verdict === "Accepted") {
                               const data = await this.adminDB.findOne(
                                 this.adminDB.solved,
@@ -370,29 +600,33 @@ export default class Problem {
                               }
                             }
 
-                            // Returning the verdict.
+                            // Returing the response.
                             res.send({ success: true, verdict: verdict });
 
-                            // Removing files from the container.
+                            // Removing the files from the server.
                             fs.unlink(
-                              `${uniqueId}-input_template.cpp`,
+                              `${uniqueId}-input_template.java`,
                               (err) => {
-                                if (err) throw err;
+                                if (err)
+                                  throw err;
                                 console.log("File has been deleted");
                               }
                             );
                             fs.unlink(`${uniqueId}-input.txt`, (err) => {
-                              if (err) throw err;
+                              if (err)
+                                throw err;
                               console.log("File has been deleted");
                             });
-                            fs.unlink(`${uniqueId}-function_def.h`, (err) => {
-                              if (err) throw err;
+                            fs.unlink(`${uniqueId}-Solution.java`, (err) => {
+                              if (err)
+                                throw err;
                               console.log("File has been deleted");
                             });
                             fs.unlink(
-                              `${uniqueId}-correct_code_CPP.cpp`,
+                              `${uniqueId}-correct_code_JAVA.java`,
                               (err) => {
-                                if (err) throw err;
+                                if (err)
+                                  throw err;
                                 console.log("File has been deleted");
                               }
                             );
@@ -402,470 +636,408 @@ export default class Problem {
                     )
                   )
                 )
-              );
-            });
+              )
+            );
           });
         });
-      } else if ((language = "Java")) {
+      });
+    }
+  }
 
-        let verdict = "";
-        const docker = new Docker();
+  async handleCPP(problemId, handle, code, timestamp, language, res) {
+    {
+      let verdict = "";
+      const docker = new Docker();
 
-        // Defining container options.
-        const containerOptions = {
-          Image: "openjdk",
-          Tty: true,
-          AttachStdin: true,
-          AttachStdout: true,
-          AttachStderr: true,
-          Cmd: ["bash"],
-        };
+      // Define container options.
+      const containerOptions = {
+        Image: "gcc",
+        Tty: true,
+        AttachStdin: true,
+        AttachStdout: true,
+        AttachStderr: true,
+        Cmd: ["bash"],
+      };
 
-        // Fetching problem from database.
-        const problem = await this.adminDB.findOne(this.adminDB.problem, {
-          _id: new ObjectId(problemId),
-        });
+      // Fetching problem details from docker database.
+      const problem = await this.adminDB.findOne(this.adminDB.problem, {
+        _id: new ObjectId(problemId),
+      });
 
-        // Unique submission id.
-        let uniqueId = handle + new Date().getTime();
+      // Unique submission id.
+      let uniqueId = handle + new Date().getTime();
 
-        // Copying input template to server.
-        fs.writeFile(
-          `${uniqueId}-input_template.java`,problem.input_template_JAVA,(err) => {
-            if (err) throw err;
-            console.log("Error in copying input template to server.");
-          }
-        );
+      // Copying the input template.
+      fs.writeFile(
+        `${uniqueId}-input_template.cpp`,
+        problem.input_template_CPP,
+        (err) => {
+          if (err)
+            throw err;
+        }
+      );
 
-        // Copying input test case file to server.
-        fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
-          if (err) throw err;
-          console.log("Error in copying input test case to server.");
-        });
+      // Copying the input testcases.
+      fs.writeFile(`${uniqueId}-input.txt`, problem.testcases, (err) => {
+        if (err)
+          throw err;
+      });
 
-        // Copying user code file to server.
-        fs.writeFile(`${uniqueId}-Solution.java`, code, (err) => {
-          if (err) throw err;
-          console.log("Error in copying user code test case to server.");
-        });
+      // Copying the user code.
+      fs.writeFile(`${uniqueId}-function_def.h`, code, (err) => {
+        if (err)
+          throw err;
+      });
 
-        // Copying correct code file to server.
-        fs.writeFile(
-          `${uniqueId}-correct_code_JAVA.java`,problem.correct_code_JAVA, (err) => {
-            if (err) throw err;
-            console.log("Error in copying correct code test case to server.");
-          }
-        );
+      // Copying the correct code cpp.
+      fs.writeFile(
+        `${uniqueId}-correct_code_CPP.cpp`,
+        problem.correct_code_CPP,
+        (err) => {
+          if (err)
+            throw err;
+        }
+      );
 
-        // Create and start container.
-        docker.createContainer(containerOptions,  (err, container) =>{
+      // Create and start container.
+      docker.createContainer(containerOptions, (err, container) => {
+        if (err) {
+          console.error("Error creating container:", err);
+          verdict = "Internal Error";
+        }
+
+        container.start((err) => {
           if (err) {
-            console.error("Error creating container:", err);
+            console.error("Error starting container:", err);
             verdict = "Internal Error";
           }
 
-          container.start( (err)=> {
+          console.log("Container started");
+
+          // Copying file the to container.
+          const pack = _pack();
+          const fileContents = readFileSync(`${uniqueId}-input_template.cpp`);
+          pack.entry({ name: "main.cpp" }, fileContents);
+          pack.finalize();
+
+          const pack2 = _pack();
+          const fileContents2 = readFileSync(`${uniqueId}-input.txt`);
+          pack2.entry({ name: "input.txt" }, fileContents2);
+          pack2.finalize();
+
+          const pack3 = _pack();
+          const fileContents3 = readFileSync(`${uniqueId}-function_def.h`);
+          pack3.entry({ name: "funcDef.h" }, fileContents3);
+          pack3.finalize();
+
+          const pack6 = _pack();
+          const fileContents6 = readFileSync(
+            `${uniqueId}-correct_code_CPP.cpp`
+          );
+          pack6.entry({ name: "cmain.cpp" }, fileContents6);
+          pack6.finalize();
+
+          container.putArchive(pack, { path: "/" }, (err) => {
             if (err) {
-              console.error("Error starting container:", err);
+              console.error("Error input template to container:", err);
               verdict = "Internal Error";
             }
+            console.log("Cpp File copied to container");
 
-            console.log("Container started");
+            container.putArchive(
+              pack2,
+              { path: "/" },
+              (err) => {
+                if (err) {
+                  console.error(
+                    "Error in copying input testcase file to container:",
+                    err
+                  );
+                  verdict = "Internal Error";
+                }
+                console.log("Input testcase file copied to container");
+              },
 
-            // Copying all the files required from the server into the container.
-            const pack = _pack();
-            const fileContents = readFileSync(`${uniqueId}-input_template.java`);
-            pack.entry({ name: "Func.java" }, fileContents);
-            pack.finalize();
-
-            const pack2 = _pack();
-            const fileContents2 = readFileSync(`${uniqueId}-input.txt`);
-            pack2.entry({ name: "input.txt" }, fileContents2);
-            pack2.finalize();
-
-            const pack3 = _pack();
-            const fileContents3 = readFileSync(`${uniqueId}-Solution.java`);
-            pack3.entry({ name: "Solution.java" }, fileContents3);
-            pack3.finalize();
-
-            // CompareFiles to compare output generated by user and admin.
-            const pack4 = _pack();
-            const fileContents4 = readFileSync("CompareFiles.java");
-            pack4.entry({ name: "CompareFiles.java" }, fileContents4);
-            pack4.finalize();
-
-            const pack6 = _pack();
-            const fileContents6 = readFileSync(`${uniqueId}-correct_code_JAVA.java`);
-            pack6.entry({ name: "CorrectCode.java" }, fileContents6);
-            pack6.finalize();
-
-            container.putArchive(pack, { path: "/" },  (err)=> {
-              if (err) {
-                console.error("Error copying file to container:", err);
-                verdict = "Internal Error";
-              }
-              console.log("Error copying input template to container.");
-
-              container.putArchive( pack2, { path: "/" }, (err)=> {
+              container.putArchive(
+                pack3,
+                { path: "/" },
+                (err) => {
                   if (err) {
-                    console.error("Error copying input test case to container:", err);
+                    console.error(
+                      "Error copying header file to container:",
+                      err
+                    );
                     verdict = "Internal Error";
                   }
-                  console.log("Error copying input test case to container.");
+                  console.log("Header File copied to container");
                 },
 
-                container.putArchive( pack3, { path: "/" }, (err)=> {
+                container.putArchive(
+                  pack6,
+                  { path: "/" },
+                  (err) => {
                     if (err) {
-                      console.error("Error copying solution java file to container:", err);
+                      console.error(
+                        "Error copying correct code to container:",
+                        err
+                      );
                       verdict = "Internal Error";
                     }
-                    console.log("Error copying solution java file to container.");
+                    console.log("Correct output File copied to container.");
                   },
 
-                  container.putArchive(pack4, { path: "/" }, (err) =>{
+                  // Compile and run code user code.
+                  container.exec(
+                    {
+                      Cmd: [
+                        "sh",
+                        "-c",
+                        "gcc main.cpp -o main -lstdc++ && ./main",
+                      ],
+                      AttachStdout: true,
+                      AttachStderr: true,
+                    },
+                    (err, exec) => {
                       if (err) {
-                        console.error("Error copying solution to container:", err);
+                        console.error("Error creating exec:", err);
                         verdict = "Internal Error";
                       }
-                      console.log("Error comparing compareFiles to container.");
-                    },
 
-                    container.putArchive( pack6, { path: "/" },(err) =>{
+                      // Start execution of user code.
+                      exec.start((err, stream) => {
                         if (err) {
-                          console.error("Error copying correct code to container:",err);
+                          console.error("Error starting exec:", err);
                           verdict = "Internal Error";
                         }
-                        console.log("Error copying correct code to container:");
-                      },
 
-                      // Compile and run user java code.
-                      container.exec(
-                        {
-                          Cmd: ["sh", "-c", "javac *.java && java Func"],
-                          AttachStdout: true,
-                          AttachStderr: true,
-                        },
-                         (err, exec)=> {
-                          if (err) {
-                            console.error("Error creating exec:", err);
-                            verdict = "Internal Error";
-                          }
+                        stream.on("data", (data) => {
+                          verdict =
+                            verdict === "" ? "Compilation Error" : verdict;
+                        });
 
-                          // Start execution.
-                          exec.start( (err, stream)=> {
+                        stream.on("error", (error) => {
+                          console.error(
+                            "Error during compilation or runtime of user code:",
+                            error
+                          );
+                        });
+
+                        // Compile and run code.
+                        container.exec(
+                          {
+                            Cmd: [
+                              "sh",
+                              "-c",
+                              "gcc cmain.cpp -o cmain -lstdc++ && ./cmain",
+                            ],
+                            AttachStdout: true,
+                            AttachStderr: true,
+                          },
+                          (err, exec) => {
                             if (err) {
-                              console.error("Error starting exec:", err);
-                              verdict = "Internal Error";
+                              console.error("Error creating exec:", err);
+                              verdict =
+                                verdict === "" ? "Internal Error" : verdict;
                             }
 
-                            stream.on("data", (data)=> {
-                              console.log(data.toString());
-                              verdict = verdict === "" ? "Compilation Error" : verdict;
-                            });
+                            // Start execution correct code.
+                            exec.start((err, stream) => {
+                              if (err) {
+                                console.error("Error starting exec:", err);
+                                verdict =
+                                  verdict === "" ? "Internal Error" : verdict;
+                              }
 
-                            stream.on("error",  (error)=> {
-                              console.error("Error during compilation or runtime:",error);
-                            });
+                              stream.on("data", (data) => { });
 
-                            // Compile and run correct java code.
-                            container.exec(
-                              {
-                                Cmd: [
-                                  "sh",
-                                  "-c",
-                                  "javac *.java && java CorrectCode",
-                                ],
-                                AttachStdout: true,
-                                AttachStderr: true,
-                              },
-                              (err, exec)=> {
+                              stream.on("error", (error) => {
+                                console.error(
+                                  "Error during compilation or runtime of correct code:",
+                                  error
+                                );
+                              });
+                            });
+                          }
+                        );
+
+                        // Putting setTimeout to allow execution first then comparision of files.
+                        setTimeout(() => {
+                          // Read the contents of the files into memory.
+                          const file1 = "output.txt";
+                          const file2 = "coutput.txt";
+
+                          // Run the diff command inside the container.
+                          container.exec(
+                            {
+                              Cmd: ["diff", file1, file2],
+                              AttachStdout: true,
+                              AttachStderr: true,
+                            },
+                            (err, exec) => {
+                              if (err) {
+                                console.error(
+                                  "Error creating exec of diff command:",
+                                  err
+                                );
+                                verdict =
+                                  verdict === "" ? "Internal Error" : verdict;
+                              }
+
+                              // Start execution.
+                              exec.start((err, stream) => {
                                 if (err) {
-                                  console.error("Error creating exec:", err);
-                                  verdict = verdict === "" ? "Internal Error" : verdict;
+                                  console.error(
+                                    "Error starting exec of diff command:",
+                                    err
+                                  );
+                                  verdict =
+                                    verdict === ""
+                                      ? "Internal Error"
+                                      : verdict;
                                 }
 
-                                // Start execution of correct code.
-                                exec.start( (err, stream)=> {
-                                  if (err) {
-                                    console.error("Error starting exec:", err);
-                                    verdict = verdict === "" ? "Internal Error" : verdict;
-                                  }
-
-                                  stream.on("data",  (data)=> {
-                                    console.log(data.toString());
-                                  });
-
-                                  // Runtime or compilation error while running.
-                                  stream.on("error",(error)=> {
-                                    console.error("Error during compilation or runtime:",error);
-                                  });
+                                let output = "";
+                                stream.on("data", (data) => {
+                                  output += data.toString();
                                 });
+
+                                // On stream end.
+                                stream.on("end", () => {
+                                  // If the output of the diff command is empty, the files are the same
+                                  if (output.trim() === "") {
+                                    console.log("Correct output generated.");
+                                    verdict =
+                                      verdict === "" ? "Accepted" : verdict;
+                                  } else {
+                                    console.log("The files are different");
+                                    verdict =
+                                      verdict === "" ? "Accepted" : verdict;
+                                  }
+                                });
+
+                                stream.on("error", (error) => {
+                                  console.error(
+                                    "Error during diff command:",
+                                    error
+                                  );
+                                  verdict =
+                                    verdict === ""
+                                      ? "Internal Error"
+                                      : verdict;
+                                });
+                              });
+                            }
+                          );
+                        }, 4000 * problem.time_limit);
+
+                        // After verdict.
+                        setTimeout(async () => {
+                          container.modem.demuxStream(
+                            stream,
+                            process.stdout,
+                            process.stderr
+                          );
+
+                          // Stopping the container.
+                          container.stop((err) => {
+                            if (err) {
+                              console.error("Error stopping container:", err);
+                              verdict =
+                                verdict === "" ? "Internal Error" : verdict;
+                            }
+                            console.log("Container stopped");
+                            container.remove((err) => {
+                              if (err) {
+                                console.error(
+                                  "Error removing container:",
+                                  err
+                                );
+                                verdict =
+                                  verdict === "" ? "Internal Error" : verdict;
+                              }
+                              console.log("Container removed");
+                            });
+                          });
+                          console.log(verdict);
+                          await this.adminDB.insertOne(
+                            this.adminDB.solution,
+                            {
+                              code: code,
+                              verdict: verdict,
+                              problemId: problemId,
+                              handle: handle,
+                              timestamp: new Date(timestamp),
+                              language: language,
+                            }
+                          );
+
+                          // If verdict is accepted.
+                          if (verdict === "Accepted") {
+                            const data = await this.adminDB.findOne(
+                              this.adminDB.solved,
+                              {
+                                handle: handle,
+                              },
+                              {
+                                problems: 1,
                               }
                             );
-
-                            setTimeout(() => {
-
-                              // Read the contents of the files into memory
-                              const file1 = "output.txt";
-                              const file2 = "coutput.txt";
-
-                              // Run the compareFiles inside the container.
-                              container.exec(
+                            console.log(data, handle);
+                            if (!data.problems.includes(problemId)) {
+                              await this.adminDB.updateOne(
+                                this.adminDB.solved,
                                 {
-                                  Cmd: [
-                                    "sh",
-                                    "-c",
-                                    "javac *.java && java CompareFiles",
-                                  ],
-                                  AttachStdout: true,
-                                  AttachStderr: true,
+                                  handle: handle,
                                 },
-                                 (err, exec)=> {
-                                  if (err) {
-                                    console.error("Error creating exec:", err);
-                                    verdict = verdict === "" ? "Internal Error" : verdict;
-                                  }
-
-                                  // Start execution of compareFiles.
-                                  exec.start( (err, stream)=> {
-                                    if (err) { console.error( "Error starting exec:", err);
-                                      verdict = verdict === "" ? "Internal Error" : verdict;
-                                    }
-
-                                    let output = "";
-                                    stream.on("data", (data) =>{
-                                      output += data.toString();
-                                    });
-
-                                    stream.on("end", ()=> {
-
-                                      // If the output of the compare file is empty, the files are the same.
-                                      if (output.trim() === "") {
-                                        console.log("Both output files are the same.");
-                                        verdict = verdict === "" ? "Accepted" : verdict;
-                                      } else {
-                                        console.log("Output files are the same.");
-                                        verdict = verdict === "" ? "Wrong Answer" : verdict;  
-                                      }
-                                    });
-
-                                    // Error occured while exceuting  compareFiles.
-                                    stream.on("error",  (error) =>{
-                                      console.error("Error during diff command:", error);
-                                      verdict = verdict === "" ? "Internal Error" : verdict; 
-                                    });
-                                  });
-                                }
-                              );
-                            }, 4000 * problem.time_limit);
-
-                            setTimeout(async () => {
-                              container.modem.demuxStream(
-                                stream,
-                                process.stdout,
-                                process.stderr
-                              );
-
-                              // Stopping the container.
-                              container.stop( (err)=> {
-                                if (err) {
-                                  console.error("Error stopping container:",err);
-                                  verdict = verdict === "" ? "Internal Error" : verdict; 
-                                }
-                                console.log("Container stopped");
-
-                                // Removing the container.
-                                container.remove((err)=> {
-                                  if (err) {
-                                    console.error("Error removing container:",err);
-                                    verdict = verdict === "" ? "Internal Error" : verdict; 
-                                  }
-                                  console.log("Container removed");
-                                });
-                              });
-
-                              // Printing the verdict.
-                              console.log(verdict);
-
-                              // Saving the submission to the database.
-                              await this.adminDB.insertOne(this.adminDB.solution, {
-                                code: code,
-                                verdict: verdict,
-                                problemId: problemId,
-                                handle: handle,
-                                timestamp: new Date(timestamp),
-                                language: language,
-                              });
-
-                              if (verdict === "Accepted") {
-                                const data = await this.adminDB.findOne(
-                                  this.adminDB.solved,
-                                  {
-                                    handle: handle,
+                                {
+                                  $push: {
+                                    problems: problemId,
                                   },
-                                  {
-                                    problems: 1,
-                                  }
-                                );
-                                console.log(data, handle);
-                                if (!data.problems.includes(problemId)) {
-                                  await this.adminDB.updateOne(
-                                    this.adminDB.solved,
-                                    {
-                                      handle: handle,
-                                    },
-                                    {
-                                      $push: {
-                                        problems: problemId,
-                                      },
-                                    }
-                                  );
-                                }
-                              }
-
-                              // Returing the response.
-                              res.send({ success: true, verdict: verdict });
-
-                              // Removing the files from the server.
-                              fs.unlink(
-                                `${uniqueId}-input_template.java`,
-                                (err) => {
-                                  if (err) throw err;
-                                  console.log("File has been deleted");
                                 }
                               );
-                              fs.unlink(`${uniqueId}-input.txt`, (err) => {
-                                if (err) throw err;
-                                console.log("File has been deleted");
-                              });
-                              fs.unlink(`${uniqueId}-Solution.java`, (err) => {
-                                if (err) throw err;
-                                console.log("File has been deleted");
-                              });
-                              fs.unlink(
-                                `${uniqueId}-correct_code_JAVA.java`,
-                                (err) => {
-                                  if (err) throw err;
-                                  console.log("File has been deleted");
-                                }
-                              );
-                            }, 8000 * problem.time_limit);
+                            }
+                          }
+
+                          // Returning the verdict.
+                          res.send({ success: true, verdict: verdict });
+
+                          // Removing files from the container.
+                          fs.unlink(
+                            `${uniqueId}-input_template.cpp`,
+                            (err) => {
+                              if (err)
+                                throw err;
+                              console.log("File has been deleted");
+                            }
+                          );
+                          fs.unlink(`${uniqueId}-input.txt`, (err) => {
+                            if (err)
+                              throw err;
+                            console.log("File has been deleted");
                           });
-                        }
-                      )
-                    )
+                          fs.unlink(`${uniqueId}-function_def.h`, (err) => {
+                            if (err)
+                              throw err;
+                            console.log("File has been deleted");
+                          });
+                          fs.unlink(
+                            `${uniqueId}-correct_code_CPP.cpp`,
+                            (err) => {
+                              if (err)
+                                throw err;
+                              console.log("File has been deleted");
+                            }
+                          );
+                        }, 8000 * problem.time_limit);
+                      });
+                    }
                   )
                 )
-              );
-            });
+              )
+            );
           });
         });
-      }
-    } catch (error) {
-      if (error instanceof TokenExpiredError) {
-
-        // Handle the token expired error here.
-        console.log("Token has expired");
-        res.send({ success: false, message: "Token has expired." });
-      } else if (error instanceof JsonWebTokenError) {
-
-        // Handle other errors here.
-        res.send({
-          success: false,
-          message: "User has logged out.Kindly login again.",
-        });
-      } else {
-        res.send({ success: false, message: error.message });
-      }
+      });
     }
-  }; // working fine
-   fetchSolvedProblems = async (req, res) => {
-    // fetch the solved problems of the user from the solved collection
-    let token = req.body.userToken;
-    try {
-        let decoded = this.adminJWT.verifyToken(token);
-        let handle = decoded.handle;
-        const data = await this.adminDB.findOne(this.adminDB.solved, {
-        handle: handle},{problems:1,_id:0}
-        );
-        res.send({ success: true, problems: data.problems,message:"Solved problems fetched successfully" });
-        
-    } catch (error) {
-        if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
-        console.log("Token has expired");
-        res.send({ success: false, message: "Token has expired." });
-        } else if (error instanceof JsonWebTokenError) {
-        // handle other errors here
-        res.send({
-            success: false,
-            message: "User has logged out.Kindly login again",
-        });
-        } else {
-        res.send({ success: false, message: error.message });
-        }
-    }
-  }; // working fine
-   fetchAllSubmissions = async (req, res) => {
-    // fetch all the submissions of the user from the solution collection
-    let token = req.body.token;
-    try {
-        let decoded = this.adminJWT.verifyToken(token);
-        let handle = decoded.handle;
-        let data = await this.adminDB.find(this.adminDB.solution, {
-        handle: handle
-        });
-        if(data.length > 0){
-            let problems = data.map(item => new ObjectId(item.problemId));
-            const problemData = await this.adminDB.find(this.adminDB.problem, {
-                _id: { $in: problems }
-            },{},{title:1});
-            console.log(problemData);
-            data = data.map(item => {
-                let problem = problemData.find(problem => problem._id.toString() === item.problemId.toString());
-                return {
-                    ...item,title:problem.title
-                }
-            });
-        }
-        res.send({ success: true, submissions: data,message:"Submissions fetched successfully" });
-        
-    } catch (error) {
-        if (error instanceof TokenExpiredError) {
-        // handle the token expired error here
-        res.send({ success: false, message: "Token has expired." });
-        } else if (error instanceof JsonWebTokenError) {
-        // handle other errors here
-        res.send({
-            success: false,
-            message: "User has logged out.Kindly login again",
-        });
-        } else {
-        res.send({ success: false, message: error.message });
-        }
-    }
-  }; // working fine
-   fetchAllProblems = async (req, res) => {
-    // fetch all the problems from the problem collection
-    try {
-        let data = await this.adminDB.find(this.adminDB.problem, {},{timestamp:-1},{title:1,timestamp:1});
-        res.send({ success: true, problems: data,message:"Problems fetched successfully" });
-        
-    } catch (error) {
-        res.send({ success: false, message: error.message });
-    }
-  }; // working fine
-   fetchProblemDetails = async (req, res) => {
-    // fetch the problem details from the problem collection
-    let problemId = req.body.problemId;
-    try {
-        let data = await this.adminDB.findOne(this.adminDB.problem, {
-        _id: new ObjectId(problemId)
-        },{_id:0,correct_code_CPP:0,correct_code_JAVA:0,testcases:0});
-        res.send({ success: true, problem: data,message:"Problem details fetched successfully" });
-        
-    } catch (error) {
-        res.send({ success: false, message: error.message });
-    }
-  }; // working fine
+  }
 }
