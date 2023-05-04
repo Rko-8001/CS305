@@ -22,7 +22,7 @@ async function main() {
   app.post("/verifyOTP", user.verifyOTP);
   app.post("/fillDetails", user.fillDetails);
   app.post("/userLogin", user.userLogin);
-  app.get("/getUserDetails", user.getUserDetails);
+  app.post("/getUserDetails", user.getUserDetails);
   app.post("/updateProfile", user.updateProfile);
   app.post("/userLogout", user.userLogout);
   app.post("/changePassword", user.changePassword);

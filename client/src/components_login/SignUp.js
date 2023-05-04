@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Otp from './Otp';
 import SignUpCreds from './SignUpCreds';
-import { url } from '../components/Request';
+import { url } from '../components_shared/Request';
 
 const emptyInfo = {
     "name": "",

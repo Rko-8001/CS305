@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { url } from '../components/Request';
+import { url } from '../components_shared/Request';
 import { setUserToken, setRoleToken } from './Token';
 
 const loginTemplate = {
@@ -37,7 +37,7 @@ export default function SignIn() {
 
     async function login(e) {
         e.preventDefault();
-        
+
         if (!checkInfo()) {
             window.alert("enter Credentials properly")
             return;
@@ -51,16 +51,15 @@ export default function SignIn() {
             body: JSON.stringify({ email: loginUser.email, password: loginUser.password })
         })
 
-        if (response.status === 400) {
+        const data = await response.json();
+        if (!data.success) {
             window.alert("Invalid Creds..");
             return;
         }
 
-        const data = await response.json();
         const role = data.type;
-        setUserToken(loginUser.email);
+        setUserToken(data.userToken);
         setRoleToken(role);
-
         if (role === "0") {
             // student
             navigate('/student')
@@ -120,7 +119,7 @@ export default function SignIn() {
 
 
                         <div className="mt-3">
-                            <button  onClick={login} className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                            <button onClick={login} className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                                 Sign In
                             </button>
 
