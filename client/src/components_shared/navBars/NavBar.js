@@ -10,7 +10,6 @@ const publicRoutes = [
 const studentRoutes = [
     { name: "Home", link: "/student" },
     { name: "Practice", link: "/problem" },
-    { name: "Editorials", link: "/editorial" },
     { name: "Blogs", link: "/blog" },
     { name: "Logout", link: "/" },
 ]
@@ -38,7 +37,7 @@ function NavBar() {
         navigate(link);
     }
 
-    
+
     useEffect(() => {
 
         const role = getRoleToken();
