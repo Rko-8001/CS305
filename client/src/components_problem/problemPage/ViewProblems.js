@@ -21,8 +21,8 @@ export default function ViewProblems() {
     return response.json();
   }
 
-  const renderProblems = problems.map((problem) =>
-    <li key={problem._id}>
+  const renderProblems = problems.map((problem, index) =>
+    <li key={index} >
       <div className="mx-4 sm:mx-8 px-4 sm:px-8 py-4 overflow-x-auto ">
         <div className="inline-block min-w-full shadow rounded-lg overflow-hidden ">
           <div className="grid flex-1 grid-cols-6 gap-4 px-5 py-3 border-b-2 border-gray-200 hover:bg-green-100 bg-white text-left  font-semibold text-gray-600 uppercase tracking-wider">
@@ -36,7 +36,8 @@ export default function ViewProblems() {
                 <button
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate(`/problem/${problem._id}`);
+                    const link = `/problem/${problem._id}`
+                    navigate(link);
                   }}
                   className="m-2 bg-indigo-600 px-4 py-2 rounded-md right text-white font-semibold tracking-wide cursor-pointer">
                   Solve

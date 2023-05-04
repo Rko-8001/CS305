@@ -55,14 +55,7 @@ export default function MainPage() {
     return (
         <>
             <h2>
-                {/* Hello, {user} */}
-                {/* <ViewAProblem props={problem1}/> */}
-                {/* <ViewABlog props={blog1}/> */}
-                {/* <ViewBlogs/>
-                <ViewEditorials/> */}
-                {/* <AddBlog/> */}
-                {/* <AddEditorial/> */}
-                {/* <AddProblem/> */}
+                
                 <ViewAEditorial props={blog1}/>
             </h2>
         </>
