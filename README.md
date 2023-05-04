@@ -1,18 +1,19 @@
 # CS305-Online Coding Platform
 
-Assuing You are running the application on Linux(Ubuntu)
+Assuming you are running the application on Linux(Ubuntu)
 
 First install docker desktop (Take documentation as reference)
 
-pull two images using command:
+Pull two images using command:
 
 -> docker pull gcc 
 
 -> docker pull openjdk
 
+You might have to give user permission to docker
 
 
-First Start the back-end by running the Backend
+First Start the back-end by running the Backend:
 
 First navigate to the main server.js file using the following commands:
 
@@ -33,14 +34,13 @@ From the root of the directory navigate to the client part
 
 -> npm install
 
-(To install all the necessary packages)
+(To install all the necessary packages for the client part)
 
 Now to start the application(front-end) run command:
 
 -> npm start
 
-
-
+This would start the application on local host.
 
 
 How to test Backend:
@@ -55,4 +55,4 @@ For generating the coverage report run:
 
 -> npm run coverage
 
-After running
+After running these commands proper coverage reports will be generated.
