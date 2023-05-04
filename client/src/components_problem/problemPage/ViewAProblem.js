@@ -12,6 +12,7 @@ import 'ace-builds/src-noconflict/mode-c_cpp';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/ext-error_marker';
+import SpecficProblemSkeleton from '../../components_skeleton/SpecficProblemSkeleton';
 
 
 
@@ -77,7 +78,7 @@ const ViewAProblem = () => {
             {
                 isLoading
                     ?
-                    <> </>
+                    <SpecficProblemSkeleton />
                     :
                     <div className="grid grid-cols-2 h-screen">
                         <div className="bg-gray-200">

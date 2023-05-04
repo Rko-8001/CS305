@@ -19,7 +19,6 @@ import {
 function App() {
   return (
     <>
-
       <Routes>
         <Route path='/' element={<LandingPage />} />
         <Route path='/meetTheTeam'
@@ -63,12 +62,12 @@ function App() {
           <Route index element={ViewProblem} />
           <Route path=':id' element={ViewSpecficProblem} />
         </Route>
-        
+
         <Route path='/editorial'>
           <Route index element={ViewEditorial} />
           <Route path=':id' element={ViewSpecficEditorial} />
         </Route>
-        
+
         <Route path='/blog'>
           <Route index element={ViewBlog} />
           <Route path=':id' element={ViewSpecficBlog} />
