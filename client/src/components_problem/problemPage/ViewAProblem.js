@@ -12,16 +12,18 @@ import { url } from '../../components_shared/Request';
 const ViewAProblem = () => {
 
     let problemToken = useParams();
+
+    
     const [problemData, setProblemData] = useState();
     const [isLoading, setIsLoading] = useState(true);
-
     const [selectedLang, setSelectedLang] = useState("cpp");
+    const [code, setCodeChange] = useState("")
+    const [value, setValue] = useState("// Code goes here");
+    
     const handleLanguageChange = (event) => {
         setSelectedLang(event.target.value);
         console.log("changed")
     };
-    const [code, setCodeChange] = useState("")
-    const [value, setValue] = useState("// Code goes here");
 
     const handleValueChange = (newValue) => {
         setValue(newValue);
@@ -49,7 +51,6 @@ const ViewAProblem = () => {
         })
         return response.json();
     }
-
 
     useEffect(() => {
 

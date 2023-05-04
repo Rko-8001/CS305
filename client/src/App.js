@@ -50,7 +50,7 @@ function App() {
           <Route path='profile' element={Profiles} />
           <Route path='addBlog' element={AddBlogs} />
           <Route path='addProblem' element={AddProblems} />
-          <Route path='addEditorial' element={AddEditorials} />
+          <Route path='addEditorial/:id' element={AddEditorials} />
         </Route>
 
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getRoleToken, removeRoleToken, removeUserToken } from '../../components_login/Token';
 
 const publicRoutes = [
@@ -20,6 +20,9 @@ const studentRoutes = [
 
 const coordinatorRoutes = [
     { name: "Home", link: "/admin" },
+    { name: "Add Blog", link: "/admin/addBlog" },
+    { name: "Add Problem", link: "/admin/addProblem" },
+    { name: "Problems", link: "/problem" },
     { name: "Logout", link: "/" },
 ]
 
@@ -42,8 +45,10 @@ function NavBar() {
         const role = getRoleToken();
         if (role === "0")
             setRoutes(studentRoutes);
-        else
+        else if (role === "1" || role === "2")
             setRoutes(coordinatorRoutes);
+        else
+            setRoutes(publicRoutes);
     }, [])
 
 

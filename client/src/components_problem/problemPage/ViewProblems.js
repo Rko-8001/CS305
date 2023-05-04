@@ -49,7 +49,7 @@ export default function ViewProblems() {
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        // navigate(`/problem/${problem._id}`);
+                        navigate(`/admin/addEditorial/${problem._id}`);
                       }}
                       className="bg-indigo-600 px-4 py-2 rounded-md right text-white font-semibold tracking-wide cursor-pointer">
                       Post Editorial

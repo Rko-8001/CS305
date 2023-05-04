@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { url } from '../../../components_shared/Request';
 import { getUserToken } from '../../../components_login/Token';
+import { useParams } from 'react-router-dom';
 
 function AddEditorial() {
 
+    const objectProblem = useParams();
     const emptyEditorial = {
         "title": "",
         "content": "",
@@ -16,19 +18,19 @@ function AddEditorial() {
 
 
 
-    async function handleSubmit (e) {
+    async function handleSubmit(e) {
         e.preventDefault();
         emptyEditorial.title = title;
         emptyEditorial.content = content;
         emptyEditorial.links = info;
-        
+
         // alert(emptyBlog);
 
         const createEditorialCheck = await createEditoral();
-        if(!createEditorialCheck.success){
+        if (!createEditorialCheck.success) {
             alert(createEditorialCheck.message)
         }
-        else{
+        else {
             alert(createEditorialCheck.message);
         }
 
@@ -51,7 +53,7 @@ function AddEditorial() {
                 title: emptyEditorial.title,
                 content: emptyEditorial.content,
                 links: emptyEditorial.links,
-                problemID: "1234",
+                problemId: objectProblem.id,
             })
 
         });
