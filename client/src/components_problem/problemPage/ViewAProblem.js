@@ -21,16 +21,18 @@ const ViewAProblem = () => {
 
     let problemToken = useParams();
 
-
+    const [subButton,setButton] = useState("Submit");
     const [problemData, setProblemData] = useState();
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedLang, setSelectedLang] = useState("cpp");
+    const [selectedLang, setSelectedLang] = useState("C++");
     // const [code, setCodeChange] = useState("")
     const [code, setCode] = useState("// Code goes here");
 
     const handleLanguageChange = (event) => {
         setSelectedLang(event.target.value);
         console.log("changed")
+        if(selectedLang==='C++'){
+        selectedLang('Java')}
     };
 
     const handleCodeChange = (newValue) => {
@@ -70,26 +72,28 @@ const ViewAProblem = () => {
                 problemId: problemToken.id,
                 userToken: getUserToken(),
                 code: code,
-                handle: "rko",
+                handle: "",
                 timestamp: new Date(),
                 language: selectedLang,
             })
         });
 
         const data = await response.json();
+        return data.success;
     }
+    
 
     async function handleSubmit(e) {
         console.log(code);
         console.log("Submitting");
+        setButton("Submitting.");
         const submited = await SubmitSolution();
         if (!submited) {
-            alert("Error submitting code");
+            alert("Error");
         }
         else {
-            alert("Code Submitted successfully");
+            alert("Accepted");
         }
-
     }
 
 
@@ -98,6 +102,7 @@ const ViewAProblem = () => {
         fetchProblem().then((data) => {
             if (data.success) {
                 setProblemData(data.problem);
+                setCode(data.problem.function_def_CPP);
                 if (data.problem) {
                     setIsLoading(false);
                 }
@@ -226,7 +231,7 @@ const ViewAProblem = () => {
                                     onClick={handleSubmit}
                                     type="submit"
                                     class="my-1 ml-5 bg-blue-500 text-white py-2 px-4 rounded">
-                                    Submit
+                                    {subButton}
                                 </button>
                             </div>
                         </div>
