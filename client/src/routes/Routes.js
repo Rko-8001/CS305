@@ -2,7 +2,7 @@ import NavBar from "../components_shared/navBars/NavBar";
 import Profile from "../components_shared/profile/Profile";
 import ViewProblems from "../components_problem/problemPage/ViewProblems";
 import ViewAProblem from "../components_problem/problemPage/ViewAProblem";
-import ViewBlogs from "../components_blog/ViewABlog";
+import ViewBlogs from "../components_blog/ViewBlogs";
 import ViewABlog from "../components_blog/ViewABlog";
 import ViewEditorials from "../components_blog/ViewEditorials";
 import ViewAEditorial from "../components_blog/ViewAEditorial";

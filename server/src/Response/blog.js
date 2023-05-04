@@ -40,6 +40,7 @@ export default class Blog{
       }; // working fine
        comment = async (req, res) => {
         try {
+          console.log(req.body);
           let token = req.body.userToken;
           let decodeData = this.adminJWT.verifyToken(token);
           let Id = req.body.Id;
@@ -48,6 +49,7 @@ export default class Blog{
           let comment = req.body.comment;
           let timestamp = req.body.timestamp;
           let Comment = new comments({handle:handle,comment:comment,timestamp:timestamp});
+          console.log(Comment);
           const data = await this.adminDB.updateOne(
             entityType ? this.adminDB.blog : this.adminDB.editorials,
             { _id: new ObjectId(Id) },
@@ -60,7 +62,7 @@ export default class Blog{
           if (data.modifiedCount === 1) {
             res.send({ success: true,message:"Comment posted." });
           } else {
-            res.send({ success: false,message:"Comment cannot be posted due to internal error." });
+            res.send({ success: false,message:"Comment cannot be posted due to internal 2." });
           }
         } catch (error) {
           if (error instanceof TokenExpiredError) {
@@ -70,7 +72,7 @@ export default class Blog{
           } else {
             // handle other errors here
             console.log('Error:', error);
-            res.send({success:false,message:"Comment cannot be posted due to internal error."})
+            res.send({success:false,message:"Comment cannot be posted due to internal error1."})
           } 
         }
       }; // working fine
