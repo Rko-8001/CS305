@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { url } from '../../components_shared/Request';
+import { getUserToken } from '../../components_login/Token';
 
 
 
@@ -24,17 +25,17 @@ const ViewAProblem = () => {
     const [problemData, setProblemData] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [selectedLang, setSelectedLang] = useState("cpp");
-    const [code, setCodeChange] = useState("")
-    const [value, setValue] = useState("// Code goes here");
+    // const [code, setCodeChange] = useState("")
+    const [code, setCode] = useState("// Code goes here");
 
     const handleLanguageChange = (event) => {
         setSelectedLang(event.target.value);
         console.log("changed")
     };
 
-    const handleValueChange = (newValue) => {
-        setValue(newValue);
-        console.log(value)
+    const handleCodeChange = (newValue) => {
+        setCode(newValue);
+        console.log(code)
     };
 
     const handleAnnotations = (annotations) => {
@@ -59,6 +60,39 @@ const ViewAProblem = () => {
         return response.json();
     }
 
+    async function SubmitSolution() {
+        const response = await fetch(`${url}/submitSolution`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                problemId: problemToken.id,
+                userToken: getUserToken(),
+                code: code,
+                handle: "rko",
+                timestamp: new Date(),
+                language: selectedLang,
+            })
+        });
+
+        const data = await response.json();
+    }
+
+    async function handleSubmit(e) {
+        console.log(code);
+        console.log("Submitting");
+        const submited = await SubmitSolution();
+        if (!submited) {
+            alert("Error submitting code");
+        }
+        else {
+            alert("Code Submitted successfully");
+        }
+
+    }
+
+
     useEffect(() => {
 
         fetchProblem().then((data) => {
@@ -71,6 +105,8 @@ const ViewAProblem = () => {
             }
         })
     }, [])
+
+
 
 
     return (
@@ -140,8 +176,8 @@ const ViewAProblem = () => {
                                     mode="c_cpp"
                                     width=""
                                     theme="monokai"
-                                    value={value}
-                                    onChange={handleValueChange}
+                                    value={code}
+                                    onChange={handleCodeChange}
                                     name="code-editor"
                                     editorproblemData={{ $blockScrolling: true }}
                                     setOptions={{
@@ -186,7 +222,10 @@ const ViewAProblem = () => {
                                 {/* <button type="submit" class="my-1 ml-5 bg-blue-500 text-white py-2 px-4 rounded">
                                     Test the code
                                 </button> */}
-                                <button type="submit" class="my-1 ml-5 bg-blue-500 text-white py-2 px-4 rounded">
+                                <button
+                                    onClick={handleSubmit}
+                                    type="submit"
+                                    class="my-1 ml-5 bg-blue-500 text-white py-2 px-4 rounded">
                                     Submit
                                 </button>
                             </div>
