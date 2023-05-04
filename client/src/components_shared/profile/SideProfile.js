@@ -2,24 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { getRoleToken } from '../../components_login/Token'
 import { url } from '../Request';
 
-export default function SideProfile({ info, load }) {
+export default function SideProfile({ info, load, blogs }) {
 
-    const [blogs, setBlogs] = useState();
-    const [isLoading, setIsLoading] = useState(true);
 
-    async function fetchBlogs() {
-        const response = await fetch(`${url}/getBlogs`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
 
-        return response.json();
-    }
 
-    const renderBlogs = blogs.map((item, index) =>
+    const renderBlogs = blogs && blogs.map((item, index) =>
         <li>
             {index > 5 ?
                 <div> </div >
@@ -39,14 +27,7 @@ export default function SideProfile({ info, load }) {
         </li>
 
     )
-    useEffect(() => {
-        fetchBlogs().then((data) => {
-            setBlogs(data.data);
-            setIsLoading(false);
-        }).catch(e => {
-            console.log(e);
-        })
-    }, [])
+
     return (
         <>
             <div class="w-full md:w-3/12 md:mx-2">
@@ -80,7 +61,7 @@ export default function SideProfile({ info, load }) {
                     <div class="grid ">
                         <div class="text-center my-2">
                             {
-                                isLoading
+                                load
                                     ?
                                     <>
                                         <p class="w-full h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>

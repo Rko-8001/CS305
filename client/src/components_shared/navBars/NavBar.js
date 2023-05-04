@@ -38,6 +38,8 @@ function NavBar() {
         }
         navigate(link);
     }
+
+    
     useEffect(() => {
 
         const role = getRoleToken();
