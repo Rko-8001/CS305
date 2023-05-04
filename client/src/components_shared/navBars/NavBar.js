@@ -13,7 +13,6 @@ const studentRoutes = [
     { name: "Practice", link: "/problem" },
     { name: "Editorials", link: "/editorial" },
     { name: "Blogs", link: "/blog" },
-    { name: "Profile", link: "/student/profile" },
     { name: "Logout", link: "/" },
 ]
 
