@@ -18,6 +18,7 @@ const ViewABlog = () => {
 
     function handleChange(event) {
         setComment(event.target.value);
+        console.log(comment);
     }
     async function fetchComments() {
         console.log("fetch comments");
@@ -69,6 +70,7 @@ const ViewABlog = () => {
         e.preventDefault();
         // console.log(data);
         const posted = await postComment();
+        console.log((comment))
         if (!posted) {
             alert("Error in posting comment");
         }
@@ -119,6 +121,7 @@ const ViewABlog = () => {
                                     </div>
                                     <button type="button"
                                         // onClick={handleSubmi}
+                                        // value={comment}
                                         onClick={handleSubmit}
                                         class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-dark-purple rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
                                         Post comment
@@ -166,7 +169,7 @@ const ViewABlog = () => {
                                                     </ul>
                                                 </div>
                                             </footer>
-                                            <p class="text-gray-500 dark:text-gray-400">qswdefghj</p>
+                                            <p class="text-gray-500 dark:text-gray-400">{item.comment}</p>
                                             <div class="flex items-center mt-4 space-x-4">
                                                 <button type="button"
 

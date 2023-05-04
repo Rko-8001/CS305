@@ -40,6 +40,7 @@ export default class Blog{
       }; // working fine
        comment = async (req, res) => {
         try {
+          console.log(req.body);
           let token = req.body.userToken;
           let decodeData = this.adminJWT.verifyToken(token);
           let Id = req.body.Id;
@@ -48,6 +49,7 @@ export default class Blog{
           let comment = req.body.comment;
           let timestamp = req.body.timestamp;
           let Comment = new comments({handle:handle,comment:comment,timestamp:timestamp});
+          console.log(Comment);
           const data = await this.adminDB.updateOne(
             entityType ? this.adminDB.blog : this.adminDB.editorials,
             { _id: new ObjectId(Id) },
