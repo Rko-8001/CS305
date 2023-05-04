@@ -12,7 +12,7 @@ export default function SignIn() {
 
     const navigate = useNavigate();
     const [loginUser, setLoginUser] = useState(loginTemplate);
-
+    const [buttonSignIn, setButtonSignIn] = useState("Sign In");
     function getLoginUser(e) {
         const { name, value } = e.target;
         addLoginUser(name, value)
@@ -42,7 +42,7 @@ export default function SignIn() {
             window.alert("enter Credentials properly")
             return;
         }
-
+        setButtonSignIn("Trying to Log you In");
         const response = await fetch(`${url}/userLogin`, {
             method: "POST",
             headers: {
@@ -54,6 +54,7 @@ export default function SignIn() {
         const data = await response.json();
         if (!data.success) {
             window.alert("Invalid Creds..");
+            setButtonSignIn("Sign In");
             return;
         }
 
@@ -120,7 +121,7 @@ export default function SignIn() {
 
                         <div className="mt-3">
                             <button onClick={login} className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
-                                Sign In
+                                {buttonSignIn}
                             </button>
 
 
