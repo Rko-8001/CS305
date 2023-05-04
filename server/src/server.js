@@ -34,7 +34,7 @@ async function main() {
   app.post("/submitSolution", problem.submitSolution);
   app.get("/getEditorial", blog.getEditorial);
   app.get("/getBlogs", blog.getBlogs);
-  app.post("/getBlogComments", blog.getBlogComments);
+  app.post("/getBlogComments", blog.getBlog);
   app.post("/fetchSolvedProblems", problem.fetchSolvedProblems);
   app.post("/fetchAllSubmissions", problem.fetchAllSubmissions);
   app.get("/fetchAllProblems", problem.fetchAllProblems);

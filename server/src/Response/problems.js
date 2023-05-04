@@ -159,6 +159,7 @@ export default class Problem {
           message: "User has logged out.Kindly login again",
         });
       } else {
+        console.log(error);
         res.send({ success: false, message: error.message });
       }
     }
@@ -201,7 +202,6 @@ export default class Problem {
       res.send({ success: false, message: error.message });
     }
   }; // working fine
-
 
    handleJAVA = async (problemId, handle, code, timestamp, language, res)=> {
     {
@@ -643,8 +643,7 @@ export default class Problem {
       });
     }
   }
-
-  async handleCPP(problemId, handle, code, timestamp, language, res) {
+  handleCPP = async (problemId, handle, code, timestamp, language, res) =>{
     {
       let verdict = "";
       const docker = new Docker();

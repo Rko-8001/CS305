@@ -1,4 +1,4 @@
-import { stub, match, restore } from "sinon";
+import sinon,{ stub, match, restore } from "sinon";
 import { expect } from "chai";
 import jwt from "jsonwebtoken";
 const { TokenExpiredError } = jwt;
@@ -230,7 +230,7 @@ describe("Blog", () => {
     });
   });
 
-  describe("getBlogComments", () => {
+  describe("getBlog", () => {
     let testBlog;
 
     beforeEach(() => {
@@ -261,21 +261,20 @@ describe("Blog", () => {
       adminDB.findOne.returns({ comments: expectedComments });
 
       // Calling the getBlogComments function
-      await testBlog.getBlogComments(req, res);
+      await testBlog.getBlog(req, res);
 
       // Assertions
       expect(
         adminDB.findOne.calledOnceWith(
           adminDB.blog,
           { _id: new ObjectId("validBlogId1") },
-          { comments: 1, _id: 0 }
         )
       ).to.be.true;
       expect(
         res.send.calledOnceWith({
-          data: expectedComments,
+          data: { comments: expectedComments },
           success: true,
-          message: "Comments sent successfully.",
+          message: "Data sent successfully.",
         })
       ).to.be.true;
     });
@@ -285,20 +284,20 @@ describe("Blog", () => {
       adminDB.findOne.throws(new Error("Some error"));
 
       // Calling the getBlogComments function
-      await testBlog.getBlogComments(req, res);
+      await testBlog.getBlog(req, res);
 
       // Assertions
       expect(
         adminDB.findOne.calledOnceWith(
           adminDB.blog,
           { _id: new ObjectId("validBlogId1") },
-          { comments: 1, _id: 0 }
+          
         )
       ).to.be.true;
       expect(
         res.send.calledOnceWith({
           success: false,
-          message: "Comments could not be sent due to some internal error.",
+          message: "Data could not be sent due to some internal error.",
         })
       ).to.be.true;
     });
@@ -348,6 +347,92 @@ describe('getBlogs', () => {
     // Assertions
     expect(adminDB.find.calledOnceWith(adminDB.blog, {}, { timestamp: -1 }, { comments: 0 })).to.be.true;
     expect(res.send.calledOnceWith({ success: false, message: 'Blogs could not be sent due to some internal error.' })).to.be.true;
+  });
+});
+
+describe('comment', () => {
+let comment;
+  beforeEach(() => {
+    adminDB = {
+      updateOne: sinon.stub(),
+      blog: 'blog',
+
+    }
+    adminJWT = {
+      verifyToken: sinon.stub(),
+    };
+    req = {
+      body: {
+        userToken: 'testToken',
+        Id: 'testId123445',
+        entityType: 'blog',
+        comment: 'testComment',
+        timestamp: Date.now(),
+      },
+    };
+    res = {
+      send: sinon.spy(),
+    };
+    comment = new Blog(adminDB, adminJWT).comment;
+  });
+
+  it('should post a comment to a blog or editorial', async () => {
+    const decodeData = { handle: 'testHandle' };
+    const updateResult = { modifiedCount: 1 };
+    const expectedComment = {
+      handle: decodeData.handle,
+      comment: req.body.comment,
+      timestamp: req.body.timestamp,
+    };
+
+    adminJWT.verifyToken.returns(decodeData);
+    adminDB.updateOne.returns(updateResult);
+
+    await comment(req, res);
+
+    expect(adminJWT.verifyToken.calledOnce).to.be.true;
+    expect(adminJWT.verifyToken.firstCall.args[0]).to.equal(req.body.userToken);
+    expect(adminDB.updateOne.calledOnce).to.be.true;
+    // expect(adminDB.updateOne.firstCall.args[0]).to.equal(adminDB.blog);
+    // expect(adminDB.updateOne.firstCall.args[1]).to.deep.equal({
+    //   _id: new ObjectId(req.body.Id),
+    // });
+    // expect(adminDB.updateOne.firstCall.args[2]).to.deep.equal({
+    //   $push: {
+    //     comments: expectedComment,
+    //   },
+    // });
+    expect(res.send.calledOnce).to.be.true;
+    expect(res.send.firstCall.args[0]).to.deep.equal({
+      success: true,
+      message: 'Comment posted.',
+    });
+  });
+
+  it('should handle token expired errors', async () => {
+    const expiredError = new TokenExpiredError('TokenExpiredError');
+    adminJWT.verifyToken.throws(expiredError);
+
+    await comment(req, res);
+
+    expect(res.send.calledOnce).to.be.true;
+    expect(res.send.firstCall.args[0]).to.deep.equal({
+      success: false,
+      message: 'Token has expired.',
+    });
+  });
+
+  it('should handle other errors', async () => {
+    const errorMessage = 'Error posting comment';
+    adminDB.updateOne = sinon.stub().throws(new Error(errorMessage));
+    adminJWT.verifyToken.returns({ handle: 'testHandle' });
+    await comment(req, res);
+
+    expect(res.send.calledOnce).to.be.true;
+    expect(res.send.firstCall.args[0]).to.deep.equal({
+      success: false,
+      message: 'Comment cannot be posted due to internal error.',
+    });
   });
 });
 

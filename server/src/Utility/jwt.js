@@ -7,7 +7,7 @@ class JWT{
     }
 
     createToken(email,handle,type){
-        return this.jwt.sign({email,handle,type},process.env.SECRET_KEY, { expiresIn: '1h' });
+        return this.jwt.sign({email,handle,type},process.env.SECRET_KEY, { expiresIn: '1d' });
     }
 
     verifyToken(token){
