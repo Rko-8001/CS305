@@ -4,14 +4,16 @@ import Team from './components_shared/sidePages/teams/Team';
 import { Routes, Route } from 'react-router-dom';
 import SignIn from './components_login/SignIn';
 import SignUp from './components_login/SignUp';
-import MainPage from './components_student/MainPage';
-import Profile from './components_shared/profile/Profile';
-import ViewProblems from './components_problem/problemPage/ViewProblems';
-import ViewAProblem from '../src/components_problem/problemPage/ViewAProblem';
-import AddProblem from './components_admin/addContent/problems/AddProblem';
-import AddEditorial from './components_admin/addContent/editorial/AddEditorial';
-import ViewEditorials from './components_blog/ViewEditorials';
 
+
+import {
+  StudentHome, Profiles,
+  ViewProblem, ViewSpecficProblem,
+  ViewBlog, ViewSpecficBlog,
+  ViewEditorial, ViewSpecficEditorial,
+  AddBlogs, AddProblems, AddEditorials,
+  AdminHome
+} from './routes/Routes';
 
 
 function App() {
@@ -43,45 +45,33 @@ function App() {
             </>
           } />
 
-        <Route path='/admin' element={
-          <>
-            <NavBar />
-            {/* <ViewA/> */}
-          </>
-        } />
+        <Route path='/admin'>
+          <Route index element={AdminHome} />
+          <Route path='profile' element={Profiles} />
+          <Route path='addBlog' element={AddBlogs} />
+          <Route path='addProblem' element={AddProblems} />
+          <Route path='addEditorial' element={AddEditorials} />
+        </Route>
+
 
         <Route path='/student'>
-          <Route index
-            element={
-              <>
-                <NavBar />
-                <MainPage />
-              </>
-            } />
-
-          <Route path='profile'
-            element={
-              <>
-                <NavBar />
-                <Profile />
-              </>
-            } />
-
+          <Route index element={StudentHome} />
+          <Route path='profile' element={Profiles} />
         </Route>
 
         <Route path='/problem'>
-          <Route index
-            element={
-              <>
-                <NavBar />
-                <ViewProblems />
-              </>
-            }
-          />
-          <Route path=':id' element={<>
-            <NavBar />
-            <ViewAProblem />
-          </>} />
+          <Route index element={ViewProblem} />
+          <Route path=':id' element={ViewSpecficProblem} />
+        </Route>
+        
+        <Route path='/editorial'>
+          <Route index element={ViewEditorial} />
+          <Route path=':id' element={ViewSpecficEditorial} />
+        </Route>
+        
+        <Route path='/blog'>
+          <Route index element={ViewBlog} />
+          <Route path=':id' element={ViewSpecficBlog} />
         </Route>
       </Routes>
     </>

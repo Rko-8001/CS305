@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom';
-import { getRoleToken } from '../../components_login/Token';
+import { Link, useNavigate } from 'react-router-dom';
+import { getRoleToken, removeRoleToken, removeUserToken } from '../../components_login/Token';
 
 const publicRoutes = [
     { name: "Home", link: "/" },
@@ -11,6 +11,9 @@ const publicRoutes = [
 ]
 const studentRoutes = [
     { name: "Home", link: "/student" },
+    { name: "Practice", link: "/problem" },
+    { name: "Editorials", link: "/editorial" },
+    { name: "Blogs", link: "/blog" },
     { name: "Profile", link: "/student/profile" },
     { name: "Logout", link: "/" },
 ]
@@ -19,13 +22,21 @@ const coordinatorRoutes = [
     { name: "Home", link: "/admin" },
     { name: "Logout", link: "/" },
 ]
+
 function NavBar() {
 
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [openClass, setOpenClass] = useState("opacity-0 -translate-x-full");
-
     const [routes, setRoutes] = useState(publicRoutes);
 
+    function routeHandler(name, link) {
+        if (name === 'Logout') {
+            removeRoleToken();
+            removeUserToken();
+        }
+        navigate(link);
+    }
     useEffect(() => {
 
         const role = getRoleToken();
@@ -74,9 +85,16 @@ function NavBar() {
                             className={` ${openClass} absolute inset-x-0 z-20 w-full px-6 py-4 transition-all duration-300 ease-in-out  lg:mt-0 lg:p-0 lg:top-0 lg:relative lg:bg-transparent lg:w-auto lg:opacity-100 lg:translate-x-0 lg:flex lg:items-center`}>
                             <div className="flex flex-col -mx-6 lg:flex-row lg:items-center lg:mx-8">
                                 {routes.map((item, index) =>
-                                    <Link to={item.link} key={index} className="px-3 py-2 mx-3 mt-2 text-white hover:text-black hover:bg-white transition-colors duration-300 transform rounded-md lg:mt-0 ">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            routeHandler(item.name, item.link);
+                                        }}
+                                        key={index}
+                                        className="px-3 py-2 mx-3 mt-2 text-white hover:text-black hover:bg-white transition-colors duration-300 transform rounded-md lg:mt-0 "
+                                    >
                                         {item.name}
-                                    </Link>
+                                    </button>
                                 )}
                             </div>
 

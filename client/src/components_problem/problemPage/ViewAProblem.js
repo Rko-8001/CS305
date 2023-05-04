@@ -7,7 +7,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/ext-error_marker';
 
 
-const ViewProblem = ({ props }) => {
+const ViewAProblem = ({ props }) => {
     const [selectedLang, setSelectedLang] = useState("cpp");
     const handleLanguageChange = (event) => {
         setSelectedLang(event.target.value);
@@ -151,4 +151,4 @@ const ViewProblem = ({ props }) => {
     )
 }
 
-export default ViewProblem
+export default ViewAProblem

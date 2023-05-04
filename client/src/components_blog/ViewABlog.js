@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 
-const ViewBlogs = ({ props }) => {
+const ViewABlog = ({ props }) => {
     const [comment, setComment] = useState("");
 
   function handleSubmit(event) {
@@ -111,4 +111,4 @@ const ViewBlogs = ({ props }) => {
     )
 }
 
-export default ViewBlogs
+export default ViewABlog
