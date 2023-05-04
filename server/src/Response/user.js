@@ -113,11 +113,9 @@ export default class User {
     } catch (err) {
       if (err instanceof TokenExpiredError) {
         // handle the token expired error here
-        console.log("Token has expired");
         res.send({ success: false, message: "Token has expired." });
       } else {
         // handle other errors here
-        console.log("Error:", err);
         res.send({ success: false, message: "Profile Updation Failed." });
       }
     }
@@ -139,8 +137,7 @@ export default class User {
           email === "" ||
           password === "" ||
           name === "" ||
-          handle === "" ||
-          type === ""
+          handle === "" 
         ) {
           res.send({ success: false, message: "Please fill all the details." });
           return;
@@ -212,7 +209,6 @@ export default class User {
         // if user does not exist then register the user
         // send the random OTP to the user
         const otp = Math.floor(Math.random() * 1000000);
-        console.log("OTP: " + otp);
         this.adminMail.sendOTP(email, otp);
         const checkOTP = await this.adminDB.findOne(this.adminDB.otp, { email: email });
         if (checkOTP) {
