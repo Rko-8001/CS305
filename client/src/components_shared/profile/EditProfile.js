@@ -1,8 +1,8 @@
 import React from 'react'
 
-export default function EditProfile({ editInfo, getEditInfo }) {
+export default function EditProfile(props) {
 
-
+    const { editInfo, getEditInfo, getNewInfo, newInfo, updateInfo } = props;
     return (
         <>
 
@@ -26,28 +26,32 @@ export default function EditProfile({ editInfo, getEditInfo }) {
                             <div className="grid gap-4 mb-4 sm:grid-cols-2">
                                 <div>
                                     <label for="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Birthday</label>
-                                    <input type="text" name="name" id="name" value="07-05-2002" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Ex. Apple iMac 27&ldquo;" />
+                                    <input onChange={getNewInfo} type="text" name="birthdate" id="name" value={newInfo.birthdate} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="12-12-2012" />
                                 </div>
-                                <div>
+                                {/* <div>
                                     <label for="brand" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Mobile No.</label>
                                     <input type="text" name="brand" id="brand" value="7710603791" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Ex. Apple" />
-                                </div>
+                                </div> */}
                                 <div>
                                     <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
-                                    <input type="number" value="Lab 301" name="price" id="price" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="$299" />
+                                    <input onChange={getNewInfo} type="text" value={newInfo.address} name="address" id="price" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="IIT Ropar" />
                                 </div>
                                 <div>
                                     <label for="category" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">City</label>
-                                    <input type="number" value="Ropar" name="price" id="price" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="$299" />
+                                    <input onChange={getNewInfo} type="text" value={newInfo.city} name="city" id="catergory" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Ropar" />
                                 </div>
-                                <div className="sm:col-span-2">
+                                {/* <div>
+                                    <label for="categor" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Country</label>
+                                    <input onChange={getNewInfo} type="number" value={newInfo.country} name="country" id="categor" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="$299" />
+                                </div> */}
+                                {/* <div className="sm:col-span-2">
                                     <label for="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">More About You</label>
                                     <textarea id="description" rows="5" className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Write a description...">
                                     </textarea>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="flex items-center space-x-4">
-                                <button type="button" class="text-blue-600 inline-flex items-center hover:text-white border border-blue-600 hover:bg-black focus:ring-4 focus:outline-none focus:ring-black font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
+                                <button type="button" onClick={updateInfo} className="text-blue-600 inline-flex items-center hover:text-white border border-blue-600 hover:bg-black focus:ring-4 focus:outline-none focus:ring-black font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900">
                                     Update Profile
                                 </button>
                             </div>

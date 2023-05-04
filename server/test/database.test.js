@@ -251,7 +251,6 @@ describe("database", () => {
         });
       it('should set some values to all the documents with the required filter', async () => {
         const docs = await testDatabase.update(testDatabase.users, {  }, { $set: { age:50 } });
-        console.log(docs)
         expect(docs.modifiedCount).to.equal(3);
       });
   

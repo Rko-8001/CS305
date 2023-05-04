@@ -14,10 +14,7 @@ const studentRoutes = [
     { name: "Profile", link: "/student/profile" },
     { name: "Logout", link: "/" },
 ]
-const adminRoutes = [
-    { name: "Home", link: "/admin" },
-    { name: "Logout", link: "/" },
-]
+
 const coordinatorRoutes = [
     { name: "Home", link: "/admin" },
     { name: "Logout", link: "/" },
@@ -34,10 +31,8 @@ function NavBar() {
         const role = getRoleToken();
         if (role === "0")
             setRoutes(studentRoutes);
-        else if (role === "1")
+        else
             setRoutes(coordinatorRoutes);
-        else if (role === "2")
-            setRoutes(adminRoutes);
     }, [])
 
 
