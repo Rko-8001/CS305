@@ -60,7 +60,7 @@ export default class Blog{
           if (data.modifiedCount === 1) {
             res.send({ success: true,message:"Comment posted." });
           } else {
-            res.send({ success: false,message:"Comment cannot be posted due to internal error." });
+            res.send({ success: false,message:"Comment cannot be posted due to internal 2." });
           }
         } catch (error) {
           if (error instanceof TokenExpiredError) {
@@ -70,7 +70,7 @@ export default class Blog{
           } else {
             // handle other errors here
             console.log('Error:', error);
-            res.send({success:false,message:"Comment cannot be posted due to internal error."})
+            res.send({success:false,message:"Comment cannot be posted due to internal error1."})
           } 
         }
       }; // working fine
@@ -141,9 +141,9 @@ export default class Blog{
           let blogId = req.body.blogId;
           const data = await this.adminDB.findOne(this.adminDB.blog, {
             _id: new ObjectId(blogId),
-          },{comments:1,_id:0});
+          },{});
           if (data) {
-            res.send({ data: data.comments, success: true,message:"Comments sent successfully." });
+            res.send({ data: data, success: true,message:"Comments sent successfully." });
           } else {
             res.send({ success: false,message:"Comments could not be sent due to some internal error." });
           }
