@@ -89,7 +89,6 @@ const ViewAProblem = () => {
         else {
             alert("Code Submitted successfully");
         }
-
     }
 
 

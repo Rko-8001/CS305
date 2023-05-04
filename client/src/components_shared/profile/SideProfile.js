@@ -19,26 +19,26 @@ export default function SideProfile({ info, load }) {
         return response.json();
     }
 
-    const renderBlogs = blogs.map((item, index) =>
-        <li>
-            {index > 5 ?
-                <div> </div >
-                :
-                <div class="flex my-5 w-full overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
-                    <div class="flex items-center justify-center w-20 font-bold bg-emerald-500">
-                        {item.handle}
-                    </div>
+    // const renderBlogs = blogs.map((item, index) =>
+    //     <li>
+    //         {index > 5 ?
+    //             <div> </div >
+    //             :
+    //             <div class="flex my-5 w-full overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
+    //                 <div class="flex items-center justify-center w-20 font-bold bg-emerald-500">
+    //                     {item.handle}
+    //                 </div>
 
-                    <div class="px-1 py-2 ">
-                        <div class="mx-3">
-                            {item.title}
-                        </div>
-                    </div>
-                </div>
-            }
-        </li>
+    //                 <div class="px-1 py-2 ">
+    //                     <div class="mx-3">
+    //                         {item.title}
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         }
+    //     </li>
 
-    )
+    // )
     useEffect(() => {
         fetchBlogs().then((data) => {
             setBlogs(data.data);
@@ -89,7 +89,7 @@ export default function SideProfile({ info, load }) {
                                     :
                                     <>
                                         <ul>
-                                            {renderBlogs}
+                                            {/* {renderBlogs} */}
                                         </ul>
                                         {/* renderBlogs */}
                                     </>
