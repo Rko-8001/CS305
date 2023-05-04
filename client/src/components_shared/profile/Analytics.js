@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from 'react'
+import React, { useState, useEffect } from 'react'
 import CanvasJSReact from '../../assests/canvasjs.react';
 import { url } from '../Request';
 import { getUserToken } from '../../components_login/Token';
@@ -20,7 +20,7 @@ export default function Analytics() {
         { x: new Date(2023, 9), y: 0 },
         { x: new Date(2023, 10), y: 0 },
         { x: new Date(2023, 11), y: 0 },
-        
+
     ]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -123,6 +123,7 @@ export default function Analytics() {
             console.log(e);
         })
         setIsLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
