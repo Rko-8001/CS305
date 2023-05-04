@@ -1,0 +1,7 @@
+NODE_ENV=development
+NODE_PORT=5000
+DB_URI=mongodb+srv://dbUser:HnmIp4VuOHExde12@cluster0.yneow2u.mongodb.net/?retryWrites=true&w=majority
+DB_NAME="codingSite"
+NODEMAILER_EMAIL=softe72.softe@gmail.com
+NODEMAILER_PASSWORD=ydzgbugatmkotqre
+SECRET_KEY=ebe10d57096fb5722642fd53dfc54e3fee7cd7a62cd793ec800ee5bc682aaaae

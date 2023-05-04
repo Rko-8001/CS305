@@ -32,7 +32,7 @@ export default class Email {
       }
     });
   }
-
+  // function to send OTP to the user
   sendOTP = (email, otp) => {
       this.sendMail(email, "OTP", `Your OTP is ${otp}`);
     // function to send OTP to the user

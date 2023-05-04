@@ -3,18 +3,18 @@ import pkg from "jsonwebtoken";
 // import { ObjectId } from "mongodb";
 const { TokenExpiredError, JsonWebTokenError } = pkg;
 export default class User {
+  // constructor
   constructor(adminDB, adminJWT,adminMail) {
     this.adminDB = adminDB;
     this.adminJWT =adminJWT;
     this.adminMail = adminMail;
   }
-  
+  // userlogin
   userLogin = async (req, res) => {
     // type 0 student
     // type 2 admin
     try {
       // extract data from request body
-      
       const email = req.body.email;
       const password = req.body.password;
       // find user in database
@@ -27,7 +27,9 @@ export default class User {
           handle: 1,
         }
       );
+      // if user exists then compare password
       if (user) {
+        // compare password
         bcrypt.compare(password, user.password, (_err, result) => {
           if (result) {
             // if password matches then send success response
@@ -50,7 +52,8 @@ export default class User {
     } catch (error) {
       res.send({ success: false, message: error.message });
     }
-  }; // working fine
+  }; 
+  // getting user details
   getUserDetails = async (req, res) => {
     let token = req.body.userToken;
     try {
@@ -61,6 +64,7 @@ export default class User {
         { email: email },
         { password: 0, _id: 0 }
       );
+      // if user exists then send user details
       if (user) {
         res.send({ success: true, message: "User Details", user: user });
       } else {
@@ -69,7 +73,7 @@ export default class User {
     } catch (error) {
       if (error instanceof TokenExpiredError) {
         // handle the token expired error here
-        console.log("Token has expired");
+        // console.log("Token has expired");
         res.send({ success: false, message: "Token has expired." });
       } else if (error instanceof JsonWebTokenError) {
         // handle other errors here
@@ -81,7 +85,8 @@ export default class User {
         res.send({ success: false, message: error.message });
       }
     }
-  }; // working fine
+  }; 
+  // update profile details
   updateProfile = async (req, res) => {
     // extract data from request body
     try {
@@ -119,7 +124,8 @@ export default class User {
         res.send({ success: false, message: "Profile Updation Failed." });
       }
     }
-  }; // working fine
+  }; 
+  // filling the details of the user
   fillDetails = async (req, res) => {
     // extract data from request body
     try {
@@ -142,6 +148,7 @@ export default class User {
           res.send({ success: false, message: "Please fill all the details." });
           return;
         }
+
         bcrypt.hash(password, 10, (err, hash)=> {
           // Store hash in your password DB.
           if (err) {
@@ -151,6 +158,7 @@ export default class User {
             });
             return;
           } else {
+            // store user details in database
             this.adminDB.insertOne(this.adminDB.users, {
               email: email,
               password: hash,
@@ -175,7 +183,8 @@ export default class User {
     } catch (error) {
       res.send({ success: false, message: "User Registration Failed" });
     }
-  }; // working fine
+  }; 
+
   // sendOTP and verifyOTP are used for email verification
   verifyOTP = async (req, res) => {
     // extract data from request body
@@ -194,7 +203,8 @@ export default class User {
     } catch (error) {
       res.send({ success: false, message: "OTP Verification Failed." });
     }
-  }; // working fine
+  }; 
+  // sendOTP and verifyOTP are used for email verification
   sendOTP = async (req, res) => {
     try {
       // extract data from request body
@@ -225,7 +235,8 @@ export default class User {
     } catch (error) {
       res.send({ success: false, message: "OTP generation failed." });
     }
-  }; // working fine
+  }; 
+  // changePassword is used to change the password of the user
   changePassword = async (req, res) => {
     // extract data from request body
     try {
@@ -256,7 +267,8 @@ export default class User {
         message: "Password Updation Failed due to some internal error.",
       });
     }
-  }; // working fine
+  }; 
+  // user logout is used to logout the user
   userLogout = async (req, res) => {
     // extract data from request body
     try {
@@ -289,10 +301,10 @@ export default class User {
         res.send({ success: false, message: error.message });
       }
     }
-  }; // working fine
+  }; 
+  // get all the handle of the users
   getAllHandles = async (req, res) => {
     // extract data from request body
-
     try {
       const users = await this.adminDB.find(this.adminDB.users, {});
       let handles = [];

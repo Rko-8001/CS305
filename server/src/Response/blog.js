@@ -6,10 +6,12 @@ import { pack as _pack } from 'tar-stream';
 
 
 export default class Blog{
+  // constructor
     constructor(adminDB,adminJWT){
       this.adminDB = adminDB;
       this.adminJWT = adminJWT;
     }
+    // post blog method
      postBlog = async (req, res) => {
         try {
           // working fine
@@ -37,7 +39,8 @@ export default class Blog{
             res.send({success:false,message:"Blog posting failed."})
           }
         }
-      }; // working fine
+      }; 
+      // comment method
        comment = async (req, res) => {
         try {
           console.log(req.body);
@@ -74,7 +77,8 @@ export default class Blog{
             res.send({success:false,message:"Comment cannot be posted due to internal error."})
           } 
         }
-      }; // working fine
+      }; 
+      // post editorial API
        postEditorial = async (req, res) => {
         try {
           // working fine
@@ -107,7 +111,8 @@ export default class Blog{
             res.send({success:false,message:"Editorial posting failed."})
           }
         }
-      }; // working fine
+      }; 
+      // get editorial API
        getEditorial = async (req, res) => {
         try {
             let problemId = req.body.problemId;
@@ -122,7 +127,8 @@ export default class Blog{
         } catch (error) {
             res.send({ success: false,message:"Editorial could not be sent due to some internal error." });
         }
-      }; // working fine
+      }; 
+      // get blogs API
        getBlogs = async (_req, res) => {
         try {
             const data = await this.adminDB.find(this.adminDB.blog,{},{"timestamp":-1},{comments : 0});
@@ -134,7 +140,8 @@ export default class Blog{
         } catch (error) {
             res.send({ success: false,message:"Blogs could not be sent due to some internal error." });
         }
-      }; // working fine
+      }; 
+      // get blog API
        getBlog = async (req,res) => {
         try {
           let blogId = req.body.blogId;
@@ -149,5 +156,5 @@ export default class Blog{
         } catch (error) {
           res.send({ success: false,message:"Data could not be sent due to some internal error." });
         }
-      } // working fine
+      } 
 }

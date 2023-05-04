@@ -1,6 +1,7 @@
 import { Double, ObjectId } from "mongodb";
 
 class problem {
+    // constructor
     constructor(obj) {
         this.author_handle = obj.author_handle; // string
         this.title = obj.title; // string
