@@ -70,7 +70,7 @@ const ViewAProblem = () => {
                 problemId: problemToken.id,
                 userToken: getUserToken(),
                 code: code,
-                handle: "rko",
+                handle: "",
                 timestamp: new Date(),
                 language: selectedLang,
             })
@@ -78,6 +78,7 @@ const ViewAProblem = () => {
 
         const data = await response.json();
     }
+    
 
     async function handleSubmit(e) {
         console.log(code);
