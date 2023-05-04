@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import User from "../src/Response/user.js";
 import jwt from "jsonwebtoken";
 const { expect } = chai;
-const { TokenExpiredError } = jwt;
+const { TokenExpiredError,JsonWebTokenError } = jwt;
 describe("User", () => {
   let user;
   let handle = "user";
@@ -921,4 +921,175 @@ describe("User", () => {
       bcryptHashStub.restore();
     });
   });
+  describe('userLogout', () => {
+    let   user;
+  
+    beforeEach(() => {
+      // Mocking req and res objects
+      req = { body: { userToken: 'validToken' } };
+      res = {
+        send: stub(),
+      };
+  
+      // Mocking adminJWT and adminDB objects
+      adminJWT = {
+        verifyToken: stub(),
+      };
+  
+      adminDB = {
+        findOne: stub(),
+        users: 'users',
+      };
+      
+      // Importing the userLogout function
+      user = new User(adminDB, adminJWT, {});
+    });
+    afterEach(() => {
+      // Restoring the stubbed functions to their original implementation
+      restore();
+ 
+    });
+    it('should send success response if user exists', async () => {
+      // Stubbing adminJWT.verifyToken to return email
+      adminJWT.verifyToken.returns({ email: email });
+  
+      // Stubbing adminDB.findOne to return user data
+      adminDB.findOne.returns({ email: email });
+  
+      // Calling the userLogout function
+      await user.userLogout(req, res);
+  
+      // Assertions
+      expect(adminJWT.verifyToken.calledOnceWith(req.body.userToken)).to.be.true;
+      expect(adminDB.findOne.calledOnceWith(adminDB.users, { email: email })).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: true,
+        message: 'User Logged Out Successfully',
+        userToken: '',
+      })).to.be.true;
+    });
+  
+    it('should send error response if user does not exist', async () => {
+      // Stubbing adminJWT.verifyToken to return email
+      adminJWT.verifyToken.returns({ email: email });
+  
+      // Stubbing adminDB.findOne to return null (user does not exist)
+      adminDB.findOne.returns(null);
+  
+      // Calling the userLogout function
+      await user.userLogout(req, res);
+  
+      // Assertions
+      expect(adminJWT.verifyToken.calledOnceWith(req.body.userToken)).to.be.true;
+      expect(adminDB.findOne.calledOnceWith(adminDB.users, { email: email })).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: false,
+        message: 'User does not exists',
+      })).to.be.true;
+    });
+  
+    it('should handle TokenExpiredError and send appropriate response', async () => {
+      // Stubbing adminJWT.verifyToken to throw TokenExpiredError
+      adminJWT.verifyToken.throws(new TokenExpiredError('Token expired'));
+  
+      // Calling the userLogout function
+      await user.userLogout(req, res);
+  
+      // Assertions
+      expect(adminJWT.verifyToken.calledOnceWith(req.body.userToken)).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: false,
+        message: 'User has been logged out.',
+      })).to.be.true;
+    });
+  
+    it('should handle JsonWebTokenError and send appropriate response', async () => {
+      // Stubbing adminJWT.verifyToken to throw JsonWebTokenError
+      adminJWT.verifyToken.throws(new JsonWebTokenError('Invalid token'));
+  
+      // Calling the userLogout function
+      await user.userLogout(req, res);
+  
+      // Assertions
+      expect(adminJWT.verifyToken.calledOnceWith(req.body.userToken)).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: false,
+        message: "User has logged out.Kindly login again",
+      })).to.be.true;
+    });
+    it('should handle other errors and send appropriate response', async () => {
+      // Stubbing adminJWT.verifyToken to throw an error
+      adminJWT.verifyToken.throws(new Error('Some error'));
+  
+      // Calling the userLogout function
+      await user.userLogout(req, res);
+  
+      // Assertions
+      expect(adminJWT.verifyToken.calledOnceWith(req.body.userToken)).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: false,
+        message: 'Some error',
+      })).to.be.true;
+    });
+  });
+  describe('getAllHandles', () => {
+    let user
+  
+    beforeEach(() => {
+      // Mocking req and res objects
+      req = {};
+      res = {
+        send: stub(),
+      };
+  
+      // Mocking adminDB object
+      adminDB = {
+        find: stub(),
+        users: 'users',
+      };
+  
+      user = new User(adminDB, {}, {});      
+    });
+    afterEach(() => {
+      // Restoring the stubbed functions to their original implementation
+      restore();
+    });
+  
+    it('should fetch all handles and send success response', async () => {
+      // Stubbing adminDB.find to return user data
+      const users = [
+        { handle: 'handle1' },
+        { handle: 'handle2' },
+        { handle: 'handle3' },
+      ];
+      adminDB.find.returns(users);
+  
+      // Calling the getAllHandles function
+      await user.getAllHandles(req, res);
+  
+      // Assertions
+      expect(adminDB.find.calledOnceWith(adminDB.users, {})).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: true,
+        message: 'All Handles',
+        handles: ['handle1', 'handle2', 'handle3'],
+      })).to.be.true;
+    });
+  
+    it('should handle errors and send error response', async () => {
+      // Stubbing adminDB.find to throw an error
+      adminDB.find.throws(new Error('Database error'));
+  
+      // Calling the getAllHandles function
+      await user.getAllHandles(req, res);
+  
+      // Assertions
+      expect(adminDB.find.calledOnceWith(adminDB.users, {})).to.be.true;
+      expect(res.send.calledOnceWith({
+        success: false,
+        message: 'Error in fetching handles',
+      })).to.be.true;
+    });
+  });
+  
 });

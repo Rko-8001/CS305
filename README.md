@@ -35,7 +35,10 @@ From the root of the directory navigate to the client part
 
 (To install all the necessary packages)
 
+Now to start the application(front-end) run command:
+
 -> npm start
+
 
 
 

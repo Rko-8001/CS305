@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 const { TokenExpiredError} = pkg;
 import { pack as _pack } from 'tar-stream';
 
+
 export default class Blog{
     constructor(adminDB,adminJWT){
       this.adminDB = adminDB;
@@ -33,7 +34,6 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
             res.send({success:false,message:"Blog posting failed."})
           }
         }
@@ -71,8 +71,7 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
-            res.send({success:false,message:"Comment cannot be posted due to internal error1."})
+            res.send({success:false,message:"Comment cannot be posted due to internal error."})
           } 
         }
       }; // working fine
@@ -105,7 +104,6 @@ export default class Blog{
             res.send({success:false,message:"Token has expired."})
           } else {
             // handle other errors here
-            console.log('Error:', error);
             res.send({success:false,message:"Editorial posting failed."})
           }
         }
@@ -122,7 +120,6 @@ export default class Blog{
               res.send({ success: false,message:"Either editorial has not been made yet or the problemId is invalid." });
             }
         } catch (error) {
-            console.log(error);
             res.send({ success: false,message:"Editorial could not be sent due to some internal error." });
         }
       }; // working fine
@@ -138,19 +135,19 @@ export default class Blog{
             res.send({ success: false,message:"Blogs could not be sent due to some internal error." });
         }
       }; // working fine
-       getBlogComments = async (req,res) => {
+       getBlog = async (req,res) => {
         try {
           let blogId = req.body.blogId;
           const data = await this.adminDB.findOne(this.adminDB.blog, {
             _id: new ObjectId(blogId),
           },{});
           if (data) {
-            res.send({ data: data, success: true,message:"Comments sent successfully." });
+            res.send({ data: data, success: true,message:"Data sent successfully." });
           } else {
-            res.send({ success: false,message:"Comments could not be sent due to some internal error." });
+            res.send({ success: false,message:"Data could not be sent due to some internal error." });
           }
         } catch (error) {
-          res.send({ success: false,message:"Comments could not be sent due to some internal error." });
+          res.send({ success: false,message:"Data could not be sent due to some internal error." });
         }
       } // working fine
 }
