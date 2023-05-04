@@ -19,6 +19,7 @@ export default function Profile() {
         "country": "",
         "birthdate": "",
     });
+    const [blogs, setBlogs] = useState();
 
 
     function getNewInfo(e) {
@@ -75,6 +76,18 @@ export default function Profile() {
         return response.json();
     }
 
+    async function fetchBlogs() {
+        const response = await fetch(`${url}/getBlogs`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+        return response.json();
+    }
+
     useEffect(() => {
         fetchProfile().then((data) => {
 
@@ -83,6 +96,13 @@ export default function Profile() {
         }).catch((e) => {
             console.log(e);
         })
+        fetchBlogs().then((data) => {
+            setBlogs(data.data);
+        }).catch((e) => {
+            console.log(e);
+        })
+
+        setIsLoading(false);
     }, [updated])
 
     return (
@@ -90,29 +110,31 @@ export default function Profile() {
             <Container maxWidth="xl">
                 <div className="container mx-auto px-5 my-5 p-5">
                     <div className="md:flex no-wrap md:-mx-2 ">
-                        <SideProfile info={userInfo} load={isLoading} />
                         {
                             isLoading ?
                                 <ProfileSkeleton />
                                 :
-                                <div className="w-full md:w-9/12 mx-2 h-64">
-                                    <EditProfile
-                                        editInfo={editInfo} getEditInfo={getEditInfo}
-                                        newInfo={newInfo} getNewInfo={getNewInfo}
-                                        updateInfo={updateInfo}
-                                    />
-                                    <div className="bg-white p-3 shadow-sm rounded-sm">
-                                        <About info={userInfo} />
-                                        <button onClick={getEditInfo}
-                                            className="block w-full text-blue-800 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 my-4"
-                                        >
-                                            Edit Information
-                                        </button>
+                                <>
+                                    <SideProfile info={userInfo} load={isLoading} blogs={blogs} />
+                                    <div className="w-full md:w-9/12 mx-2 h-64">
+                                        <EditProfile
+                                            editInfo={editInfo} getEditInfo={getEditInfo}
+                                            newInfo={newInfo} getNewInfo={getNewInfo}
+                                            updateInfo={updateInfo}
+                                        />
+                                        <div className="bg-white p-3 shadow-sm rounded-sm">
+                                            <About info={userInfo} />
+                                            <button onClick={getEditInfo}
+                                                className="block w-full text-blue-800 text-sm font-semibold rounded-lg hover:bg-gray-100 focus:outline-none focus:shadow-outline focus:bg-gray-100 hover:shadow-xs p-3 my-4"
+                                            >
+                                                Edit Information
+                                            </button>
+                                        </div>
+                                        <div className="bg-white p-3">
+                                            <Analytics />
+                                        </div>
                                     </div>
-                                    <div className="bg-white p-3">
-                                        <Analytics />
-                                    </div>
-                                </div>
+                                </>
                         }
                     </div>
                 </div>

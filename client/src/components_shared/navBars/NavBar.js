@@ -4,7 +4,6 @@ import { getRoleToken, removeRoleToken, removeUserToken } from '../../components
 
 const publicRoutes = [
     { name: "Home", link: "/" },
-    { name: "User Guide", link: "/" },
     { name: "Sign In", link: "/signin" },
     { name: "Sign Up", link: "/signup" },
 ]
@@ -13,7 +12,6 @@ const studentRoutes = [
     { name: "Practice", link: "/problem" },
     { name: "Editorials", link: "/editorial" },
     { name: "Blogs", link: "/blog" },
-    { name: "Profile", link: "/student/profile" },
     { name: "Logout", link: "/" },
 ]
 
@@ -39,6 +37,8 @@ function NavBar() {
         }
         navigate(link);
     }
+
+    
     useEffect(() => {
 
         const role = getRoleToken();

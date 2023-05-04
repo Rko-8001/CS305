@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getUserToken } from '../components_login/Token';
-import ViewAProblem from '../components_problem/problemPage/ViewAProblem';
-import ViewABlog from '../components_blog/ViewABlog';
-import ViewBlogs from '../components_blog/ViewBlogs';
-import ViewEditorials from '../components_blog/ViewEditorials';
-import AddBlog from '../components_admin/addContent/blogs/AddBlog';
-import AddEditorial from '../components_admin/addContent/editorial/AddEditorial';
-import AddProblem from '../components_admin/addContent/problems/AddProblem';
+
 import ViewAEditorial from '../components_blog/ViewAEditorial';
 
 export default function MainPage() {
