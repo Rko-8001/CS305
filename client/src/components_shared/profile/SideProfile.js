@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { getRoleToken } from '../../components_login/Token'
-import { url } from '../Request';
 
 export default function SideProfile({ info, load, blogs }) {
 
