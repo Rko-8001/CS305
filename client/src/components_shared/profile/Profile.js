@@ -6,6 +6,7 @@ import EditProfile from './EditProfile';
 import About from './About';
 import { url } from '../Request';
 import { getUserToken } from '../../components_login/Token';
+import ProfileSkeleton from '../../components_skeleton/ProfileSkeleton';
 
 export default function Profile() {
     const [userInfo, setUserInfo] = useState("");
@@ -92,7 +93,7 @@ export default function Profile() {
                         <SideProfile info={userInfo} load={isLoading} />
                         {
                             isLoading ?
-                                <></>
+                                <ProfileSkeleton />
                                 :
                                 <div className="w-full md:w-9/12 mx-2 h-64">
                                     <EditProfile
