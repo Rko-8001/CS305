@@ -81,5 +81,5 @@ In our website, Only one is superuser with Creds:
 
 ```
 Email: 2020csb1102@iitrpr.ac.in
-Password: "1234"
+Password: "****"
 ```
